@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>F1 2026 · Comparador de Pilotos e Equipes</title>
+<link href="https://fonts.googleapis.com/css2?family=Titillium+Web:wght@300;400;600;700;900&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --f1-red:#E10600;--f1-dark:#15151E;--f1-darker:#0D0D12;--f1-gray:#38383F;
+  --f1-light:#F0F0F0;--f1-accent:#FF1801;--f1-gold:#FFD700;--f1-silver:#C0C0C0;
+}
+body{font-family:'Titillium Web',sans-serif;background:var(--f1-darker);color:#fff;min-height:100vh;overflow-x:hidden;}
+
+header{
+  background:linear-gradient(180deg,#1E1E2A 0%,var(--f1-darker) 100%);
+  border-bottom:3px solid var(--f1-red);padding:16px 32px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.logo{display:flex;align-items:center;gap:14px;}
+.logo .f1-badge{
+  font-family:'Orbitron',monospace;font-size:28px;font-weight:900;
+  background:var(--f1-red);color:#fff;padding:6px 16px;border-radius:6px;
+  letter-spacing:2px;
+}
+.logo span{font-size:14px;color:#999;font-weight:400;}
+.header-ano{font-family:'Orbitron',monospace;font-size:20px;color:#555;font-weight:700;}
+
+.hero{
+  background:linear-gradient(135deg,#1E1E2A 0%,#2A1A1A 50%,#1E1E2A 100%);
+  padding:48px 32px 40px;text-align:center;position:relative;overflow:hidden;
+}
+.hero::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--f1-red);}
+.hero::after{content:'';position:absolute;bottom:-200px;right:-200px;width:600px;height:600px;background:radial-gradient(circle,rgba(225,6,0,.08) 0%,transparent 70%);border-radius:50%;}
+.hero h1{font-family:'Orbitron',monospace;font-size:36px;font-weight:900;margin-bottom:8px;position:relative;z-index:1;}
+.hero h1 span{color:var(--f1-red);}
+.hero p{color:#888;font-size:15px;position:relative;z-index:1;}
+
+.comparador{max-width:1100px;margin:0 auto;padding:40px 24px;}
+.comp-box{
+  background:var(--f1-dark);border:1px solid var(--f1-gray);border-radius:16px;
+  padding:32px;position:relative;overflow:hidden;
+}
+.comp-box::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--f1-red),var(--f1-gold),var(--f1-red));}
+.comp-title{font-family:'Orbitron',monospace;font-size:16px;color:#888;text-transform:uppercase;letter-spacing:2px;margin-bottom:24px;text-align:center;}
+.comp-selectors{display:grid;grid-template-columns:1fr auto 1fr;gap:20px;align-items:center;margin-bottom:32px;}
+.comp-side{text-align:center;}
+.comp-side label{display:block;font-size:12px;color:#666;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
+.comp-side select{
+  width:100%;padding:14px 16px;border-radius:10px;border:2px solid var(--f1-gray);
+  background:var(--f1-darker);color:#fff;font-family:'Titillium Web',sans-serif;
+  font-size:15px;font-weight:600;cursor:pointer;transition:.2s;
+  appearance:none;-webkit-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23888'%3E%3Cpath d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 14px center;
+}
+.comp-side select:focus{border-color:var(--f1-red);outline:none;}
+.comp-vs{
+  font-family:'Orbitron',monospace;font-size:24px;font-weight:900;
+  color:var(--f1-red);width:60px;height:60px;display:flex;align-items:center;
+  justify-content:center;background:rgba(225,6,0,.1);border-radius:50%;
+  border:2px solid rgba(225,6,0,.3);
+}
+.comp-type{display:flex;gap:12px;justify-content:center;margin-bottom:28px;}
+.type-btn{
+  padding:10px 24px;border-radius:999px;border:2px solid var(--f1-gray);
+  background:transparent;color:#888;font-size:13px;font-weight:700;
+  cursor:pointer;transition:.2s;text-transform:uppercase;letter-spacing:.5px;
+}
+.type-btn.active{background:var(--f1-red);border-color:var(--f1-red);color:#fff;}
+.type-btn:hover:not(.active){border-color:#888;color:#fff;}
+
+.resultado{animation:slideUp .4s ease-out;}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+
+.result-header{text-align:center;margin-bottom:28px;}
+.result-header .vs-text{font-size:14px;color:#666;margin-bottom:4px;}
+
+.versus-card{
+  display:grid;grid-template-columns:1fr auto 1fr;gap:0;align-items:stretch;
+  background:var(--f1-darker);border-radius:12px;overflow:hidden;border:1px solid var(--f1-gray);
+}
+.vc-side{padding:24px 20px;text-align:center;}
+.vc-side.winner{background:rgba(225,6,0,.06);}
+.vc-side .name{font-family:'Orbitron',monospace;font-size:18px;font-weight:700;margin-bottom:4px;}
+.vc-side .team{font-size:12px;color:#888;margin-bottom:12px;}
+.vc-side .points{font-family:'Orbitron',monospace;font-size:42px;font-weight:900;line-height:1;}
+.vc-side .points-label{font-size:11px;color:#666;margin-top:4px;text-transform:uppercase;letter-spacing:.5px;}
+.vc-center{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:20px 16px;background:rgba(255,255,255,.03);border-left:1px solid var(--f1-gray);border-right:1px solid var(--f1-gray);
+}
+.vc-center .diff{font-family:'Orbitron',monospace;font-size:32px;font-weight:900;color:var(--f1-red);}
+.vc-center .diff-label{font-size:11px;color:#666;text-transform:uppercase;letter-spacing:.5px;margin-top:4px;}
+.vc-center .winner-badge{
+  margin-top:12px;padding:4px 12px;border-radius:999px;
+  background:var(--f1-red);color:#fff;font-size:10px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.5px;
+}
+
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:28px;}
+.stat-card{
+  background:var(--f1-darker);border:1px solid var(--f1-gray);border-radius:12px;
+  padding:20px;position:relative;overflow:hidden;
+}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.stat-card.left::before{background:var(--f1-red);}
+.stat-card.right::before{background:var(--f1-gold);}
+.stat-card h3{font-family:'Orbitron',monospace;font-size:13px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;text-align:center;}
+.stat-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04);
+}
+.stat-row:last-child{border-bottom:none;}
+.stat-label{font-size:12px;color:#888;}
+.stat-label.sub{padding-left:12px;font-size:11px;color:#666;}
+.stat-value{font-family:'Orbitron',monospace;font-size:14px;font-weight:700;}
+.stat-value.better{color:var(--f1-gold);}
+.stat-value.crash-val{color:#E8601C;}
+.stat-value.mech-val{color:#6C8EBF;}
+
+.bar-section{margin-top:24px;}
+.bar-row{margin-bottom:16px;}
+.bar-label{font-size:12px;color:#888;margin-bottom:6px;display:flex;justify-content:space-between;}
+.bar-track{height:8px;background:var(--f1-gray);border-radius:99px;overflow:hidden;display:flex;}
+.bar-fill{height:100%;transition:width .6s ease-out;border-radius:99px;}
+
+.stat-bar-section{margin-top:28px;}
+.stat-bar-title{font-family:'Orbitron',monospace;font-size:14px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;text-align:center;}
+.stat-bar-row{margin-bottom:14px;}
+.stat-bar-labels{display:flex;justify-content:space-between;font-size:11px;color:#666;margin-bottom:4px;}
+.stat-bar-labels .left-name{color:var(--f1-red);font-weight:700;}
+.stat-bar-labels .right-name{color:var(--f1-gold);font-weight:700;}
+.stat-bar-track{display:flex;height:6px;background:var(--f1-gray);border-radius:99px;overflow:hidden;}
+.stat-bar-track .fill-left{background:var(--f1-red);transition:width .4s;}
+.stat-bar-track .fill-right{background:var(--f1-gold);transition:width .4s;margin-left:auto;}
+
+.tabela-section{max-width:1100px;margin:0 auto;padding:20px 24px 60px;}
+.tabela-section h2{
+  font-family:'Orbitron',monospace;font-size:18px;color:#888;text-transform:uppercase;
+  letter-spacing:2px;margin-bottom:20px;text-align:center;
+}
+.tab-btns{display:flex;gap:12px;justify-content:center;margin-bottom:20px;}
+.tab-btn{
+  padding:10px 24px;border-radius:999px;border:2px solid var(--f1-gray);
+  background:transparent;color:#888;font-size:13px;font-weight:700;
+  cursor:pointer;transition:.2s;text-transform:uppercase;letter-spacing:.5px;
+}
+.tab-btn.active{background:var(--f1-red);border-color:var(--f1-red);color:#fff;}
+.tab-btn:hover:not(.active){border-color:#888;color:#fff;}
+
+table{width:100%;border-collapse:collapse;}
+thead th{
+  text-align:left;padding:12px 16px;font-size:11px;color:#666;text-transform:uppercase;
+  letter-spacing:.5px;border-bottom:2px solid var(--f1-gray);font-weight:700;cursor:pointer;
+  user-select:none;transition:.15s;white-space:nowrap;
+}
+thead th:hover{color:#aaa;}
+thead th.sorted-asc::after{content:' ▲';color:var(--f1-red);}
+thead th.sorted-desc::after{content:' ▼';color:var(--f1-red);}
+tbody tr{transition:.15s;}
+tbody tr:hover{background:rgba(255,255,255,.03);}
+tbody td{padding:12px 16px;font-size:14px;border-bottom:1px solid rgba(255,255,255,.05);}
+tbody tr:first-child td{color:var(--f1-gold);font-weight:700;}
+tbody tr:nth-child(2) td{color:var(--f1-silver);font-weight:700;}
+tbody tr:nth-child(3) td{color:#cd7f32;font-weight:700;}
+.pos{font-family:'Orbitron',monospace;font-weight:900;width:40px;color:#555;}
+.driver-name{font-weight:700;}
+.team-tag{
+  display:inline-block;padding:2px 10px;border-radius:6px;font-size:11px;
+  font-weight:700;color:#fff;
+}
+.pts{font-family:'Orbitron',monospace;font-weight:900;text-align:right;}
+.stat-num{font-family:'Orbitron',monospace;font-weight:700;font-size:13px;text-align:center;}
+
+.footer{text-align:center;padding:32px;color:#444;font-size:12px;border-top:1px solid var(--f1-gray);}
+
+@media(max-width:768px){
+  .hero h1{font-size:24px;}
+  .comp-selectors{grid-template-columns:1fr;gap:12px;}
+  .comp-vs{width:44px;height:44px;font-size:16px;}
+  .versus-card{grid-template-columns:1fr;}
+  .vc-center{border-left:none;border-right:none;border-top:1px solid var(--f1-gray);border-bottom:1px solid var(--f1-gray);flex-direction:row;gap:12px;padding:16px;}
+  .vc-side .points{font-size:32px;}
+  .stats-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="f1-badge">F1</div>
+    <span>Comparador 2026</span>
+  </div>
+  <div style="text-align:right">
+    <div class="header-ano">2026</div>
+    <div id="apiInfo" style="font-size:10px;color:#555;margin-top:2px">Carregando dados...</div>
+  </div>
+</header>
+
+<section class="hero">
+  <h1>Compare os <span>Pilotos</span></h1>
+  <p>Estatísticas detalhadas de qualquer piloto ou equipe da F1 2026</p>
+  <p id="heroStatus" style="font-size:12px;color:#666;margin-top:8px"></p>
+</section>
+
+<section class="comparador">
+  <div class="comp-box">
+    <div class="comp-title">⚡ Ferramenta de Comparação</div>
+
+    <div class="comp-type">
+      <div class="type-btn active" data-type="piloto" onclick="setTipo('piloto')">Pilotos</div>
+      <div class="type-btn" data-type="equipe" onclick="setTipo('equipe')">Equipes</div>
+    </div>
+
+    <div class="comp-selectors">
+      <div class="comp-side">
+        <label id="label1">Piloto 1</label>
+        <select id="select1"></select>
+      </div>
+      <div class="comp-vs">VS</div>
+      <div class="comp-side">
+        <label id="label2">Piloto 2</label>
+        <select id="select2"></select>
+      </div>
+    </div>
+
+    <div id="resultado" class="resultado"></div>
+  </div>
+</section>
+
+<section class="tabela-section">
+  <h2>Classificação Atual</h2>
+  <div class="tab-btns">
+    <div class="tab-btn active" onclick="showTab('pilotos',this)">Pilotos</div>
+    <div class="tab-btn" onclick="showTab('equipes',this)">Equipes</div>
+  </div>
+  <div id="tabelaContainer"></div>
+</section>
+
+<div class="footer">Dados atualizados após GP da Bélgica (19/07/2026) · 10 de 22 etapas</div>
+
+<script>
+const drivers = [
+   {pos:1,name:"Kimi Antonelli",team:"Mercedes",pts:204,color:"#27F4D2",
+    wins:6,poles:6,podiums:8,p2:1,p3:1,sprintWins:1,crash:0,mechanic:2,fastestLaps:3,q3:10,
+    bestQuali:1},
+   {pos:2,name:"Lewis Hamilton",team:"Ferrari",pts:159,color:"#E8002D",
+    wins:1,poles:0,podiums:5,p2:3,p3:1,sprintWins:0,crash:0,mechanic:0,fastestLaps:1,q3:10,
+    bestQuali:2},
+   {pos:3,name:"George Russell",team:"Mercedes",pts:154,color:"#27F4D2",
+    wins:2,poles:4,podiums:5,p2:1,p3:1,sprintWins:1,crash:2,mechanic:1,fastestLaps:2,q3:10,
+    bestQuali:1},
+   {pos:4,name:"Charles Leclerc",team:"Ferrari",pts:126,color:"#E8002D",
+    wins:1,poles:0,podiums:4,p2:2,p3:1,sprintWins:0,crash:2,mechanic:1,fastestLaps:1,q3:10,
+    bestQuali:2},
+   {pos:5,name:"Lando Norris",team:"McLaren",pts:103,color:"#FF8000",
+    wins:0,poles:0,podiums:2,p2:1,p3:1,sprintWins:1,crash:0,mechanic:3,fastestLaps:1,q3:10,
+    bestQuali:3},
+   {pos:6,name:"Oscar Piastri",team:"McLaren",pts:92,color:"#FF8000",
+    wins:0,poles:0,podiums:2,p2:1,p3:1,sprintWins:0,crash:2,mechanic:1,fastestLaps:1,q3:10,
+    bestQuali:3},
+   {pos:7,name:"Max Verstappen",team:"Red Bull",pts:91,color:"#3671C6",
+    wins:0,poles:0,podiums:3,p2:2,p3:1,sprintWins:0,crash:1,mechanic:2,fastestLaps:1,q3:8,
+    bestQuali:2},
+   {pos:8,name:"Isack Hadjar",team:"Red Bull",pts:60,color:"#3671C6",
+    wins:0,poles:0,podiums:0,p2:0,p3:0,sprintWins:0,crash:1,mechanic:1,fastestLaps:0,q3:10,
+    bestQuali:3},
+   {pos:9,name:"Pierre Gasly",team:"Alpine",pts:42,color:"#0093CC",
+    wins:0,poles:0,podiums:1,p2:0,p3:1,sprintWins:0,crash:1,mechanic:0,fastestLaps:0,q3:4,
+    bestQuali:7},
+   {pos:10,name:"Liam Lawson",team:"Racing Bulls",pts:39,color:"#6692FF",
+    wins:0,poles:0,podiums:0,p2:0,p3:0,sprintWins:0,crash:1,mechanic:0,fastestLaps:0,q3:5,
+    bestQuali:8},
+   {pos:11,name:"Arvid Lindblad",team:"Racing Bulls",pts:22,color:"#6692FF",
+    wins:0,poles:0,podiums:0,p2:0,p3:0,sprintWins:0,crash:0,mechanic:1,fastestLaps:0,q3:6,
+    bestQuali:8},
+  {pos:12,name:"Franco Colapinto",team:"Alpine",pts:19,color:"#0093CC",
+   wins:0,poles:0,podiums:0,p2:0,p3:0,sprintWins:0,crash:0,mechanic:0,fastestLaps:0,q3:2,
+   bestQuali:8},
+   {pos:13,name:"Oliver Bearman",team:"Haas",pts:18,color:"#B6BABD",
+    wins:0,poles:0,podiums:0,p2:0,p3:0,sprintWins:0,crash:1,mechanic:2,fastestLaps:0,q3:1,
+    bestQuali:10},
+   {pos:14,name:"Gabriel Bortoleto",team:"Audi",pts:10,color:"#999999",
+    wins:0,poles:0,podiums:0,p2:0,p3:0,sprintWins:0,crash:0,mechanic:1,fastestLaps:0,q3:3,
+    bestQuali:9},
+  {pos:15,name:"Carlos Sainz",team:"Williams",pts:6,color:"#64C4FF",
+   wins:0,poles:0,podiums:0,p2:0,p3:0,sprintWins:0,crash:1,mechanic:0,fastestLaps:0,q3:0,
+   bestQuali:12},
+   {pos:16,name:"Alexander Albon",team:"Williams",pts:5,color:"#64C4FF",
+    wins:0,poles:0,podiums:0,p2:0,p3:0,sprintWins:0,crash:0,mechanic:4,fastestLaps:0,q3:0,
+    bestQuali:11},
+  {pos:17,name:"Esteban Ocon",team:"Haas",pts:3,color:"#B6BABD",
+   wins:0,poles:0,podiums:0,p2:0,p3:0,sprintWins:0,crash:1,mechanic:0,fastestLaps:0,q3:0,
+   bestQuali:12},
+   {pos:18,name:"Fernando Alonso",team:"Aston Martin",pts:1,color:"#229971",
+    wins:0,poles:0,podiums:0,p2:0,p3:0,sprintWins:0,crash:0,mechanic:4,fastestLaps:0,q3:0,
+    bestQuali:17},
+   {pos:19,name:"Nico Hülkenberg",team:"Audi",pts:0,color:"#999999",
+    wins:0,poles:0,podiums:0,p2:0,p3:0,sprintWins:0,crash:0,mechanic:4,fastestLaps:0,q3:1,
+    bestQuali:9},
+   {pos:20,name:"Valtteri Bottas",team:"Cadillac",pts:0,color:"#FF4136",
+    wins:0,poles:0,podiums:0,p2:0,p3:0,sprintWins:0,crash:0,mechanic:4,fastestLaps:0,q3:0,
+    bestQuali:18},
+   {pos:21,name:"Sergio Pérez",team:"Cadillac",pts:0,color:"#FF4136",
+    wins:0,poles:0,podiums:0,p2:0,p3:0,sprintWins:0,crash:0,mechanic:3,fastestLaps:0,q3:0,
+    bestQuali:18},
+   {pos:22,name:"Lance Stroll",team:"Aston Martin",pts:0,color:"#229971",
+    wins:0,poles:0,podiums:0,p2:0,p3:0,sprintWins:0,crash:0,mechanic:5,fastestLaps:0,q3:0,
+    bestQuali:19},
+];
+
+const teams = [
+  {pos:1,name:"Mercedes",pts:358,color:"#27F4D2",drivers:"Antonelli, Russell",
+   wins:8,poles:10,podiums:13,sprintWins:2,crash:2,mechanic:3},
+  {pos:2,name:"Ferrari",pts:285,color:"#E8002D",drivers:"Hamilton, Leclerc",
+   wins:2,poles:0,podiums:9,sprintWins:0,crash:2,mechanic:1},
+  {pos:3,name:"McLaren",pts:195,color:"#FF8000",drivers:"Norris, Piastri",
+   wins:0,poles:0,podiums:4,sprintWins:1,crash:2,mechanic:4},
+   {pos:4,name:"Red Bull",pts:151,color:"#3671C6",drivers:"Verstappen, Hadjar",
+    wins:0,poles:0,podiums:3,sprintWins:0,crash:2,mechanic:3},
+   {pos:5,name:"Alpine",pts:61,color:"#0093CC",drivers:"Gasly, Colapinto",
+    wins:0,poles:0,podiums:1,sprintWins:0,crash:1,mechanic:0},
+  {pos:6,name:"Racing Bulls",pts:61,color:"#6692FF",drivers:"Lawson, Lindblad",
+   wins:0,poles:0,podiums:0,sprintWins:0,crash:1,mechanic:1},
+    {pos:7,name:"Haas",pts:21,color:"#B6BABD",drivers:"Bearman, Ocon",
+     wins:0,poles:0,podiums:0,sprintWins:0,crash:2,mechanic:2},
+    {pos:8,name:"Williams",pts:11,color:"#64C4FF",drivers:"Sainz, Albon",
+     wins:0,poles:0,podiums:0,sprintWins:0,crash:1,mechanic:4},
+   {pos:9,name:"Audi",pts:10,color:"#999999",drivers:"Bortoleto, Hülkenberg",
+    wins:0,poles:0,podiums:0,sprintWins:0,crash:0,mechanic:5},
+   {pos:10,name:"Aston Martin",pts:1,color:"#229971",drivers:"Alonso, Stroll",
+    wins:0,poles:0,podiums:0,sprintWins:0,crash:0,mechanic:9},
+   {pos:11,name:"Cadillac",pts:0,color:"#FF4136",drivers:"Bottas, Pérez",
+    wins:0,poles:0,podiums:0,sprintWins:0,crash:0,mechanic:7},
+];
+
+let tipoAtual = 'piloto';
+
+const API_BASE = 'https://api.jolpi.ca/ergast/f1/2026';
+const DRIVER_MAP = {
+  antonelli:'Kimi Antonelli',hamilton:'Lewis Hamilton',russell:'George Russell',
+  leclerc:'Charles Leclerc',norris:'Lando Norris',piastri:'Oscar Piastri',
+  max_verstappen:'Max Verstappen',hadjar:'Isack Hadjar',gasly:'Pierre Gasly',
+  lawson:'Liam Lawson',arvid_lindblad:'Arvid Lindblad',colapinto:'Franco Colapinto',
+  bearman:'Oliver Bearman',bortoleto:'Gabriel Bortoleto',sainz:'Carlos Sainz',
+  albon:'Alexander Albon',ocon:'Esteban Ocon',alonso:'Fernando Alonso',
+  hulkenberg:'Nico Hülkenberg',bottas:'Valtteri Bottas',perez:'Sergio Pérez',
+  stroll:'Lance Stroll'
+};
+const TEAM_MAP = {
+  mercedes:'Mercedes',ferrari:'Ferrari',mclaren:'McLaren',red_bull:'Red Bull',
+  alpine:'Alpine',rb:'Racing Bulls',haas:'Haas',williams:'Williams',
+  audi:'Audi',aston_martin:'Aston Martin',cadillac:'Cadillac'
+};
+
+function findDriver(name){ return drivers.find(d=>d.name===name); }
+function findTeam(name){ return teams.find(t=>t.name===name); }
+
+async function fetchLiveData(){
+  try{
+    const heroSt = document.getElementById('heroStatus');
+    if(heroSt) heroSt.textContent='Buscando dados atualizados da F1...';
+
+    const [drvRes, conRes, resRes, qualRes, sprintRes] = await Promise.all([
+      fetch(API_BASE+'/driverstandings.json?limit=100').then(r=>r.json()),
+      fetch(API_BASE+'/constructorstandings.json?limit=100').then(r=>r.json()),
+      fetch(API_BASE+'/results.json?limit=1000').then(r=>r.json()),
+      fetch(API_BASE+'/qualifying.json?limit=1000').then(r=>r.json()),
+      fetch(API_BASE+'/sprint.json?limit=1000').then(r=>r.json()).catch(()=>null)
+    ]);
+
+    const drvList = drvRes.MRData.StandingsTable.StandingsLists[0]?.DriverStandings || [];
+    const conList = conRes.MRData.StandingsTable.StandingsLists[0]?.ConstructorStandings || [];
+    const raceResults = resRes.MRData.RaceTable?.Races || [];
+    const qualResults = qualRes.MRData.RaceTable?.Races || [];
+    const sprintResults = sprintRes?.MRData.RaceTable?.Races || [];
+
+    console.log('Race results loaded:', raceResults.length, 'races');
+    console.log('Qualifying results loaded:', qualResults.length, 'races');
+    console.log('Sprint results loaded:', sprintResults.length, 'races');
+
+    const stats = {};
+    Object.values(DRIVER_MAP).forEach(n=>{ stats[n]={wins:0,poles:0,podiums:0,p2:0,p3:0,sprintWins:0,fastestLaps:0,q3:0,bestQuali:99}; });
+
+    raceResults.forEach(race=>{
+      if(!race.Results) return;
+      race.Results.forEach(res=>{
+        const name = DRIVER_MAP[res.Driver.driverId];
+        if(!name || !stats[name]) return;
+        const pos = parseInt(res.position);
+        if(pos===1) stats[name].wins++;
+        if(pos<=3) stats[name].podiums++;
+        if(pos===2) stats[name].p2++;
+        if(pos===3) stats[name].p3++;
+        if(res.FastestLap && res.FastestLap.rank==='1') stats[name].fastestLaps++;
+      });
+    });
+
+    qualResults.forEach(race=>{
+      race.QualifyingResults.forEach(res=>{
+        const name = DRIVER_MAP[res.Driver.driverId];
+        if(!name || !stats[name]) return;
+        const pos = parseInt(res.position);
+        if(pos===1) stats[name].poles++;
+        if(pos<stats[name].bestQuali) stats[name].bestQuali=pos;
+        if(res.Q3 && res.Q3!=='') stats[name].q3++;
+      });
+    });
+
+    sprintResults.forEach(race=>{
+      (race.SprintResults||[]).forEach(res=>{
+        const name = DRIVER_MAP[res.Driver.driverId];
+        if(!name || !stats[name]) return;
+        if(parseInt(res.position)===1) stats[name].sprintWins++;
+      });
+    });
+
+    drvList.forEach(d=>{
+      const name = DRIVER_MAP[d.Driver.driverId];
+      const drv = findDriver(name);
+      if(!drv) return;
+      drv.pts = parseInt(d.points);
+      drv.pos = parseInt(d.position);
+      drv.wins = parseInt(d.wins) || stats[name].wins;
+      drv.poles = stats[name].poles;
+      drv.podiums = stats[name].podiums;
+      drv.p2 = stats[name].p2;
+      drv.p3 = stats[name].p3;
+      drv.sprintWins = stats[name].sprintWins;
+      drv.fastestLaps = stats[name].fastestLaps;
+      drv.q3 = stats[name].q3;
+      if(stats[name].bestQuali<99) drv.bestQuali = stats[name].bestQuali;
+    });
+
+    conList.forEach(c=>{
+      const name = TEAM_MAP[c.Constructor.constructorId];
+      const team = findTeam(name);
+      if(!team) return;
+      team.pts = parseInt(c.points);
+      team.pos = parseInt(c.position);
+      team.wins = parseInt(c.wins);
+    });
+
+    drivers.sort((a,b)=>a.pos-b.pos);
+    teams.sort((a,b)=>a.pos-b.pos);
+    drivers.forEach((d,i)=>d.pos=i+1);
+    teams.forEach((t,i)=>t.pos=i+1);
+
+    populateSelects();
+    comparar();
+    renderTabela('pilotos');
+
+    const info = document.getElementById('apiInfo');
+    if(info) info.textContent='Dados atualizados da Jolpica F1 API (Round '+drvRes.MRData.StandingsTable.StandingsLists[0].round+')';
+    if(heroSt) heroSt.textContent='';
+    console.log('F1 data updated from API - Round',drvRes.MRData.StandingsTable.StandingsLists[0].round);
+    console.log('Antonelli wins from API:',drvList.find(d=>d.Driver.driverId==='antonelli')?.wins);
+  }catch(e){
+    console.error('API fetch failed:', e.message, e);
+    const info = document.getElementById('apiInfo');
+    if(info) info.textContent='Dados locais (API: '+e.message.substring(0,50)+')';
+    const heroSt = document.getElementById('heroStatus');
+    if(heroSt) heroSt.textContent='Modo offline - dados locais';
+  }
+}
+
+fetchLiveData();
+
+function setTipo(t){
+  tipoAtual = t;
+  document.querySelectorAll('.type-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelector(`[data-type="${t}"]`).classList.add('active');
+  document.getElementById('label1').textContent = t==='piloto'?'Piloto 1':'Equipe 1';
+  document.getElementById('label2').textContent = t==='piloto'?'Piloto 2':'Equipe 2';
+  populateSelects();
+}
+
+function populateSelects(){
+  const list = tipoAtual==='piloto' ? drivers : teams;
+  const s1 = document.getElementById('select1');
+  const s2 = document.getElementById('select2');
+  s1.innerHTML = ''; s2.innerHTML = '';
+  list.forEach((d,i)=>{
+    s1.innerHTML += `<option value="${i}">${d.name} (${d.pts} pts)</option>`;
+    s2.innerHTML += `<option value="${i}">${d.name} (${d.pts} pts)</option>`;
+  });
+  if(list.length>1) s2.value = 1;
+  s1.onchange = comparar;
+  s2.onchange = comparar;
+  comparar();
+}
+
+function comparar(){
+  const list = tipoAtual==='piloto' ? drivers : teams;
+  const i1 = parseInt(document.getElementById('select1').value);
+  const i2 = parseInt(document.getElementById('select2').value);
+  const d1 = list[i1], d2 = list[i2];
+  const diff = Math.abs(d1.pts - d2.pts);
+  const winner = d1.pts >= d2.pts ? 1 : 2;
+  const w = winner===1 ? d1 : d2;
+
+  let statsHTML = '';
+
+  if(tipoAtual==='piloto'){
+    const dnfA = d1.crash+d1.mechanic, dnfB = d2.crash+d2.mechanic;
+    const finA = 10-dnfA, finB = 10-dnfB;
+    const s = [
+      {label:'Vitórias',a:d1.wins,b:d2.wins},
+      {label:'Poles',a:d1.poles,b:d2.poles},
+      {label:'Pódios',a:d1.podiums,b:d2.podiums},
+      {label:'2º Lugares',a:d1.p2,b:d2.p2},
+      {label:'3º Lugares',a:d1.p3,b:d2.p3},
+      {label:'Vitórias Sprint',a:d1.sprintWins,b:d2.sprintWins},
+      {label:'Voltas Mais Rápidas',a:d1.fastestLaps,b:d2.fastestLaps},
+      {label:'DNFs Totais',a:dnfA,b:dnfB,invert:true},
+      {label:'Melhor Quali',a:d1.bestQuali,b:d2.bestQuali,invert:true},
+      {label:'Q3 Alcançados',a:d1.q3,b:d2.q3},
+      {label:'Corridas Finalizadas',a:finA,b:finB},
+    ];
+
+    statsHTML = `<div class="stats-grid">
+      <div class="stat-card left"><h3>${d1.name}</h3>`;
+    s.forEach(r=>{
+      const better = r.invert ? (r.a < r.b && r.a!==r.b) : (r.a > r.b && r.a!==r.b);
+      const isSub = r.label.startsWith('  ');
+      const isCrash = r.label.includes('Batida');
+      const isMech = r.label.includes('Mecânico');
+      let valClass = better ? 'stat-value better' : 'stat-value';
+      if(isCrash && r.a > 0) valClass += ' crash-val';
+      if(isMech && r.a > 0) valClass += ' mech-val';
+      statsHTML += `<div class="stat-row"><span class="stat-label ${isSub?'sub':''}">${r.label.trim()}</span><span class="${valClass}">${r.a}</span></div>`;
+    });
+    statsHTML += `</div><div class="stat-card right"><h3>${d2.name}</h3>`;
+    s.forEach(r=>{
+      const better = r.invert ? (r.b < r.a && r.b!==r.a) : (r.b > r.a && r.b!==r.a);
+      const isSub = r.label.startsWith('  ');
+      const isCrash = r.label.includes('Batida');
+      const isMech = r.label.includes('Mecânico');
+      let valClass = better ? 'stat-value better' : 'stat-value';
+      if(isCrash && r.b > 0) valClass += ' crash-val';
+      if(isMech && r.b > 0) valClass += ' mech-val';
+      statsHTML += `<div class="stat-row"><span class="stat-label ${isSub?'sub':''}">${r.label.trim()}</span><span class="${valClass}">${r.b}</span></div>`;
+    });
+    statsHTML += `</div></div>`;
+
+    const barStats = [
+      {label:'Vitórias',a:d1.wins,b:d2.wins},
+      {label:'Poles',a:d1.poles,b:d2.poles},
+      {label:'Pódios',a:d1.podiums,b:d2.podiums},
+      {label:'DNFs Totais',a:dnfA,b:dnfB},
+    ];
+    statsHTML += `<div class="stat-bar-section"><div class="stat-bar-title">Comparação Visual</div>`;
+    barStats.forEach(r=>{
+      const total = r.a + r.b || 1;
+      const pctL = (r.a/total*100);
+      const pctR = (r.b/total*100);
+      statsHTML += `<div class="stat-bar-row">
+        <div class="stat-bar-labels"><span class="left-name">${r.a} ${r.label}</span><span class="right-name">${r.b} ${r.label}</span></div>
+        <div class="stat-bar-track"><div class="fill-left" style="width:${pctL}%"></div><div class="fill-right" style="width:${pctR}%"></div></div>
+      </div>`;
+    });
+    statsHTML += `</div>`;
+
+  } else {
+    const dnfA = d1.crash+d1.mechanic, dnfB = d2.crash+d2.mechanic;
+    const s = [
+      {label:'Vitórias',a:d1.wins,b:d2.wins},
+      {label:'Poles',a:d1.poles,b:d2.poles},
+      {label:'Pódios',a:d1.podiums,b:d2.podiums},
+      {label:'Vitórias Sprint',a:d1.sprintWins,b:d2.sprintWins},
+      {label:'DNFs Totais',a:dnfA,b:dnfB,invert:true},
+    ];
+    statsHTML = `<div class="stats-grid">
+      <div class="stat-card left"><h3>${d1.name}</h3>`;
+    s.forEach(r=>{
+      const better = r.invert ? (r.a < r.b && r.a!==r.b) : (r.a > r.b && r.a!==r.b);
+      const isSub = r.label.startsWith('  ');
+      const isCrash = r.label.includes('Batida');
+      const isMech = r.label.includes('Mecânico');
+      let valClass = better ? 'stat-value better' : 'stat-value';
+      if(isCrash && r.a > 0) valClass += ' crash-val';
+      if(isMech && r.a > 0) valClass += ' mech-val';
+      statsHTML += `<div class="stat-row"><span class="stat-label ${isSub?'sub':''}">${r.label.trim()}</span><span class="${valClass}">${r.a}</span></div>`;
+    });
+    statsHTML += `<div class="stat-row"><span class="stat-label">Pilotos</span><span class="stat-value">${d1.drivers}</span></div>`;
+    statsHTML += `</div><div class="stat-card right"><h3>${d2.name}</h3>`;
+    s.forEach(r=>{
+      const better = r.invert ? (r.b < r.a && r.b!==r.a) : (r.b > r.a && r.b!==r.a);
+      const isSub = r.label.startsWith('  ');
+      const isCrash = r.label.includes('Batida');
+      const isMech = r.label.includes('Mecânico');
+      let valClass = better ? 'stat-value better' : 'stat-value';
+      if(isCrash && r.b > 0) valClass += ' crash-val';
+      if(isMech && r.b > 0) valClass += ' mech-val';
+      statsHTML += `<div class="stat-row"><span class="stat-label ${isSub?'sub':''}">${r.label.trim()}</span><span class="${valClass}">${r.b}</span></div>`;
+    });
+    statsHTML += `<div class="stat-row"><span class="stat-label">Pilotos</span><span class="stat-value">${d2.drivers}</span></div>`;
+    statsHTML += `</div></div>`;
+  }
+
+  const pct1 = d1.pts ? (d1.pts / (d1.pts+d2.pts)*100).toFixed(1) : 0;
+  const pct2 = (100 - pct1).toFixed(1);
+
+  const res = document.getElementById('resultado');
+  res.innerHTML = `
+    <div class="result-header">
+      <div class="vs-text">${tipoAtual==='piloto'?'Pilotos':'Equipes'} selecionados</div>
+    </div>
+    <div class="versus-card">
+      <div class="vc-side ${winner===1?'winner':''}">
+        <div class="name">${d1.name}</div>
+        <div class="team">${d1.team||d1.drivers||''}</div>
+        <div class="points">${d1.pts}</div>
+        <div class="points-label">pontos</div>
+      </div>
+      <div class="vc-center">
+        <div class="diff">+${diff}</div>
+        <div class="diff-label">pontos</div>
+        <div class="winner-badge">🏆 ${w.name}</div>
+      </div>
+      <div class="vc-side ${winner===2?'winner':''}">
+        <div class="name">${d2.name}</div>
+        <div class="team">${d2.team||d2.drivers||''}</div>
+        <div class="points">${d2.pts}</div>
+        <div class="points-label">pontos</div>
+      </div>
+    </div>
+    <div class="bar-section">
+      <div class="bar-row">
+        <div class="bar-label"><span>${d1.name}</span><span>${pct1}%</span></div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width:${pct1}%;background:${d1.color||'var(--f1-red)'};border-radius:99px 0 0 99px"></div>
+          <div class="bar-fill" style="width:${pct2}%;background:${d2.color||'var(--f1-gold)'};border-radius:0 99px 99px 0;margin-left:auto"></div>
+        </div>
+        <div class="bar-label"><span></span><span>${pct2}% · ${d2.name}</span></div>
+      </div>
+    </div>
+    ${statsHTML}
+  `;
+}
+
+function showTab(tab,el){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  renderTabela(tab);
+}
+
+let sortCol = null;
+let sortDir = 1;
+
+function renderTabela(tab,listOverride){
+  const list = listOverride || (tab==='pilotos' ? drivers : teams);
+  const isPilotos = tab==='pilotos';
+
+  let headers = '';
+  if(isPilotos){
+    headers = `
+      <th class="pos" data-col="pos">Pos</th>
+      <th data-col="name">Piloto</th>
+      <th data-col="team">Equipe</th>
+      <th data-col="pts" style="text-align:right">Pts</th>
+      <th data-col="wins" style="text-align:center">V</th>
+      <th data-col="poles" style="text-align:center">Poles</th>
+      <th data-col="podiums" style="text-align:center">Pód</th>
+      <th data-col="sprintWins" style="text-align:center">Sprint</th>
+    `;
+  } else {
+    headers = `
+      <th class="pos" data-col="pos">Pos</th>
+      <th data-col="name">Equipe</th>
+      <th data-col="pts" style="text-align:right">Pts</th>
+      <th data-col="wins" style="text-align:center">V</th>
+      <th data-col="poles" style="text-align:center">Poles</th>
+      <th data-col="podiums" style="text-align:center">Pód</th>
+      <th data-col="sprintWins" style="text-align:center">Sprint</th>
+      <th>Pilotos</th>
+    `;
+  }
+
+  let rows = '';
+  list.forEach(d=>{
+    if(isPilotos){
+      rows += `<tr>
+        <td class="pos">${d.pos}</td>
+        <td class="driver-name">${d.name}</td>
+        <td><span class="team-tag" style="background:${d.color}">${d.team}</span></td>
+        <td class="pts" style="color:${d.color}">${d.pts}</td>
+        <td class="stat-num">${d.wins}</td>
+        <td class="stat-num">${d.poles}</td>
+        <td class="stat-num">${d.podiums}</td>
+        <td class="stat-num">${d.sprintWins}</td>
+      </tr>`;
+    } else {
+      rows += `<tr>
+        <td class="pos">${d.pos}</td>
+        <td class="driver-name"><span class="team-tag" style="background:${d.color}">${d.name}</span></td>
+        <td class="pts" style="color:${d.color}">${d.pts}</td>
+        <td class="stat-num">${d.wins}</td>
+        <td class="stat-num">${d.poles}</td>
+        <td class="stat-num">${d.podiums}</td>
+        <td class="stat-num">${d.sprintWins}</td>
+        <td style="font-size:12px;color:#888">${d.drivers}</td>
+      </tr>`;
+    }
+  });
+
+  const html = `<table><thead><tr>${headers}</tr></thead><tbody>${rows}</tbody></table>`;
+  document.getElementById('tabelaContainer').innerHTML = html;
+
+  document.querySelectorAll('thead th[data-col]').forEach(th=>{
+    th.addEventListener('click',()=>{
+      const col = th.dataset.col;
+      const data = tab==='pilotos' ? drivers : teams;
+      if(sortCol===col){ sortDir*=-1; } else { sortCol=col; sortDir=1; }
+      data.sort((a,b)=>{
+        let va=a[col], vb=b[col];
+        if(typeof va==='string') return sortDir * va.localeCompare(vb);
+        return sortDir * (va - vb);
+      });
+      renderTabela(tab,data);
+    });
+  });
+}
+
+populateSelects();
+renderTabela('pilotos');
+</script>
+</body>
+</html>
