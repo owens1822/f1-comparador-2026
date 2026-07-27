@@ -240,7 +240,7 @@ tbody tr:nth-child(3) td{color:#cd7f32;font-weight:700;}
   <div id="tabelaContainer"></div>
 </section>
 
-<div class="footer">Dados atualizados após GP da Bélgica (19/07/2026) · 10 de 22 etapas</div>
+<div class="footer" id="footerInfo">Carregando etapa atual...</div>
 
 <script>
 const drivers = [
@@ -364,13 +364,15 @@ async function fetchLiveData(){
     const heroSt = document.getElementById('heroStatus');
     if(heroSt) heroSt.textContent='Buscando dados atualizados da F1...';
 
-    const [drvRes, conRes, resRes, qualRes, sprintRes] = await Promise.all([
+    const [drvRes, conRes, resRes, qualRes, sprintRes, racesRes] = await Promise.all([
       fetch(API_BASE+'/driverstandings.json?limit=100').then(r=>r.json()),
       fetch(API_BASE+'/constructorstandings.json?limit=100').then(r=>r.json()),
       fetch(API_BASE+'/results.json?limit=1000').then(r=>r.json()),
       fetch(API_BASE+'/qualifying.json?limit=1000').then(r=>r.json()),
-      fetch(API_BASE+'/sprint.json?limit=1000').then(r=>r.json()).catch(()=>null)
+      fetch(API_BASE+'/sprint.json?limit=1000').then(r=>r.json()).catch(()=>null),
+      fetch(API_BASE+'/races.json?limit=100').then(r=>r.json()).catch(()=>null)
     ]);
+    const totalRaces = racesRes ? parseInt(racesRes.MRData.total) : null;
 
     const drvList = drvRes.MRData.StandingsTable.StandingsLists[0]?.DriverStandings || [];
     const conList = conRes.MRData.StandingsTable.StandingsLists[0]?.ConstructorStandings || [];
@@ -378,43 +380,50 @@ async function fetchLiveData(){
     const qualResults = qualRes.MRData.RaceTable?.Races || [];
     const sprintResults = sprintRes?.MRData.RaceTable?.Races || [];
 
-    console.log('Race results loaded:', raceResults.length, 'races');
-    console.log('Qualifying results loaded:', qualResults.length, 'races');
-    console.log('Sprint results loaded:', sprintResults.length, 'races');
-
     const stats = {};
     Object.values(DRIVER_MAP).forEach(n=>{ stats[n]={wins:0,poles:0,podiums:0,p2:0,p3:0,sprintWins:0,fastestLaps:0,q3:0,bestQuali:99}; });
+
+    const teamStats = {};
+    Object.values(TEAM_MAP).forEach(n=>{ teamStats[n]={poles:0,podiums:0,sprintWins:0}; });
 
     raceResults.forEach(race=>{
       if(!race.Results) return;
       race.Results.forEach(res=>{
         const name = DRIVER_MAP[res.Driver.driverId];
-        if(!name || !stats[name]) return;
+        const teamName = TEAM_MAP[res.Constructor?.constructorId];
         const pos = parseInt(res.position);
-        if(pos===1) stats[name].wins++;
-        if(pos<=3) stats[name].podiums++;
-        if(pos===2) stats[name].p2++;
-        if(pos===3) stats[name].p3++;
-        if(res.FastestLap && res.FastestLap.rank==='1') stats[name].fastestLaps++;
+        if(name && stats[name]){
+          if(pos===1) stats[name].wins++;
+          if(pos<=3) stats[name].podiums++;
+          if(pos===2) stats[name].p2++;
+          if(pos===3) stats[name].p3++;
+          if(res.FastestLap && res.FastestLap.rank==='1') stats[name].fastestLaps++;
+        }
+        if(teamName && teamStats[teamName] && pos<=3) teamStats[teamName].podiums++;
       });
     });
 
     qualResults.forEach(race=>{
       race.QualifyingResults.forEach(res=>{
         const name = DRIVER_MAP[res.Driver.driverId];
-        if(!name || !stats[name]) return;
+        const teamName = TEAM_MAP[res.Constructor?.constructorId];
         const pos = parseInt(res.position);
-        if(pos===1) stats[name].poles++;
-        if(pos<stats[name].bestQuali) stats[name].bestQuali=pos;
-        if(res.Q3 && res.Q3!=='') stats[name].q3++;
+        if(name && stats[name]){
+          if(pos===1) stats[name].poles++;
+          if(pos<stats[name].bestQuali) stats[name].bestQuali=pos;
+          if(res.Q3 && res.Q3!=='') stats[name].q3++;
+        }
+        if(teamName && teamStats[teamName] && pos===1) teamStats[teamName].poles++;
       });
     });
 
     sprintResults.forEach(race=>{
       (race.SprintResults||[]).forEach(res=>{
         const name = DRIVER_MAP[res.Driver.driverId];
-        if(!name || !stats[name]) return;
-        if(parseInt(res.position)===1) stats[name].sprintWins++;
+        const teamName = TEAM_MAP[res.Constructor?.constructorId];
+        const pos = parseInt(res.position);
+        if(name && stats[name] && pos===1) stats[name].sprintWins++;
+        if(teamName && teamStats[teamName] && pos===1) teamStats[teamName].sprintWins++;
       });
     });
 
@@ -442,6 +451,11 @@ async function fetchLiveData(){
       team.pts = parseInt(c.points);
       team.pos = parseInt(c.position);
       team.wins = parseInt(c.wins);
+      if(teamStats[name]){
+        team.poles = teamStats[name].poles;
+        team.podiums = teamStats[name].podiums;
+        team.sprintWins = teamStats[name].sprintWins;
+      }
     });
 
     drivers.sort((a,b)=>a.pos-b.pos);
@@ -453,11 +467,12 @@ async function fetchLiveData(){
     comparar();
     renderTabela('pilotos');
 
+    const round = drvRes.MRData.StandingsTable.StandingsLists[0]?.round;
     const info = document.getElementById('apiInfo');
-    if(info) info.textContent='Dados atualizados da Jolpica F1 API (Round '+drvRes.MRData.StandingsTable.StandingsLists[0].round+')';
+    if(info) info.textContent='Dados atualizados automaticamente (Jolpica F1 API · Etapa '+round+')';
     if(heroSt) heroSt.textContent='';
-    console.log('F1 data updated from API - Round',drvRes.MRData.StandingsTable.StandingsLists[0].round);
-    console.log('Antonelli wins from API:',drvList.find(d=>d.Driver.driverId==='antonelli')?.wins);
+    const footer = document.getElementById('footerInfo');
+    if(footer && round) footer.textContent='Dados ao vivo via Jolpica F1 API · '+round+(totalRaces?' de '+totalRaces:'')+' etapas disputadas · atualiza a cada acesso à página';
   }catch(e){
     console.error('API fetch failed:', e.message, e);
     const info = document.getElementById('apiInfo');
