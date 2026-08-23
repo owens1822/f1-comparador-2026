@@ -25,7 +25,17 @@ header{
   letter-spacing:2px;
 }
 .logo span{font-size:14px;color:#999;font-weight:400;}
-.header-ano{font-family:'Orbitron',monospace;font-size:20px;color:#555;font-weight:700;}
+.header-ano{
+  font-family:'Orbitron',monospace;font-size:15px;font-weight:900;color:#fff;
+  background:var(--f1-red);padding:4px 12px;border-radius:6px;letter-spacing:1px;
+}
+.header-updated{font-size:10px;color:#555;margin-top:4px;}
+.season-badge{
+  display:inline-flex;align-items:center;gap:6px;font-family:'Orbitron',monospace;
+  font-size:12px;font-weight:700;color:var(--f1-gold);background:rgba(255,215,0,.1);
+  border:1px solid rgba(255,215,0,.3);padding:6px 16px;border-radius:999px;
+  margin-bottom:14px;letter-spacing:1px;position:relative;z-index:1;
+}
 
 .hero{
   background:linear-gradient(135deg,#1E1E2A 0%,#2A1A1A 50%,#1E1E2A 100%);
@@ -176,6 +186,120 @@ tbody tr:nth-child(3) td{color:#cd7f32;font-weight:700;}
 
 .footer{text-align:center;padding:32px;color:#444;font-size:12px;border-top:1px solid var(--f1-gray);}
 
+/* ===== Próxima Corrida ===== */
+.proxima-corrida{max-width:1100px;margin:0 auto;padding:0 24px 40px;}
+.pc-box{
+  background:var(--f1-dark);border:1px solid var(--f1-gray);border-radius:16px;
+  padding:32px;position:relative;overflow:hidden;
+}
+.pc-box::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--f1-gold),var(--f1-red),var(--f1-gold));}
+.pc-header{text-align:center;margin-bottom:20px;}
+.pc-title{font-family:'Orbitron',monospace;font-size:14px;color:#888;text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;}
+.pc-race-name{font-family:'Orbitron',monospace;font-size:24px;font-weight:900;color:#fff;}
+.pc-circuit{font-size:13px;color:#888;margin-top:4px;}
+.pc-countdown{display:flex;justify-content:center;gap:16px;margin:24px 0 28px;flex-wrap:wrap;}
+.pc-cd-unit{
+  background:var(--f1-darker);border:1px solid var(--f1-gray);border-radius:12px;
+  width:78px;padding:12px 0;text-align:center;
+}
+.pc-cd-unit span{display:block;font-family:'Orbitron',monospace;font-size:26px;font-weight:900;color:var(--f1-red);}
+.pc-cd-unit label{font-size:10px;color:#666;text-transform:uppercase;letter-spacing:1px;}
+.pc-sessions{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:24px;}
+.session-card{
+  background:var(--f1-darker);border:1px solid var(--f1-gray);border-radius:10px;
+  padding:14px;text-align:center;
+}
+.session-card.race{border-color:var(--f1-red);background:rgba(225,6,0,.08);}
+.session-card .s-label{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;}
+.session-card .s-date{font-size:13px;font-weight:700;color:#fff;}
+.session-card .s-time{font-family:'Orbitron',monospace;font-size:16px;font-weight:900;color:var(--f1-gold);margin-top:2px;}
+.pc-weather-tire{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+.weather-card,.tire-card{
+  background:var(--f1-darker);border:1px solid var(--f1-gray);border-radius:12px;padding:20px;
+}
+.weather-card h3,.tire-card h3{font-family:'Orbitron',monospace;font-size:12px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;}
+.weather-main{display:flex;align-items:center;gap:14px;margin-bottom:10px;}
+.weather-icon{font-size:36px;}
+.weather-temp{font-family:'Orbitron',monospace;font-size:24px;font-weight:900;}
+.weather-desc{font-size:12px;color:#aaa;}
+.weather-details{font-size:12px;color:#888;line-height:1.8;}
+.tire-rec{font-size:13px;color:#ddd;line-height:1.6;}
+.tire-badge{
+  display:inline-block;padding:3px 12px;border-radius:999px;font-size:11px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;
+}
+.tire-badge.dry{background:rgba(255,215,0,.15);color:var(--f1-gold);border:1px solid rgba(255,215,0,.4);}
+.tire-badge.mixed{background:rgba(108,142,189,.15);color:#6C8EBF;border:1px solid rgba(108,142,189,.4);}
+.tire-badge.wet{background:rgba(39,180,244,.15);color:#27B4F4;border:1px solid rgba(39,180,244,.4);}
+.pc-note{font-size:11px;color:#555;text-align:center;margin-top:16px;}
+.pc-unavailable{text-align:center;color:#666;font-size:13px;padding:20px;}
+
+/* ===== Histórico de Corridas ===== */
+.historico-section{max-width:1100px;margin:0 auto;padding:20px 24px 60px;}
+.historico-section h2{
+  font-family:'Orbitron',monospace;font-size:18px;color:#888;text-transform:uppercase;
+  letter-spacing:2px;margin-bottom:6px;text-align:center;
+}
+.historico-sub{text-align:center;font-size:12px;color:#555;margin-bottom:20px;}
+.hist-columns{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+.hist-col-header{
+  font-family:'Orbitron',monospace;font-size:15px;font-weight:900;color:#fff;
+  text-align:center;padding:10px;background:var(--f1-dark);border:1px solid var(--f1-gray);
+  border-radius:10px 10px 0 0;border-bottom:none;
+}
+.hist-col .hist-scroll{border-radius:0 0 16px 16px;}
+@media(max-width:768px){ .hist-columns{grid-template-columns:1fr;} }
+.hist-scroll{
+  max-height:560px;overflow-y:auto;border:1px solid var(--f1-gray);border-radius:16px;
+  background:var(--f1-dark);padding:8px;
+}
+.hist-scroll::-webkit-scrollbar{width:8px;}
+.hist-scroll::-webkit-scrollbar-track{background:var(--f1-darker);border-radius:8px;}
+.hist-scroll::-webkit-scrollbar-thumb{background:var(--f1-gray);border-radius:8px;}
+.hist-card{
+  background:var(--f1-darker);border-radius:12px;padding:16px 18px;margin:8px;
+  border-left:4px solid var(--f1-gray);
+}
+.hist-card.win{border-left-color:var(--f1-gold);}
+.hist-card.podium{border-left-color:var(--f1-red);}
+.hist-card.dnf{border-left-color:#666;opacity:.9;}
+.hist-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:10px;}
+.hist-race-name{font-family:'Orbitron',monospace;font-size:14px;font-weight:700;color:#fff;}
+.hist-race-date{font-size:11px;color:#666;margin-top:2px;}
+.hist-badges{display:flex;gap:6px;flex-wrap:wrap;}
+.hist-badge{
+  font-size:10px;font-weight:700;padding:3px 9px;border-radius:999px;text-transform:uppercase;letter-spacing:.3px;
+}
+.hist-badge.win{background:rgba(255,215,0,.15);color:var(--f1-gold);border:1px solid rgba(255,215,0,.4);}
+.hist-badge.podium{background:rgba(225,6,0,.15);color:#ff6b60;border:1px solid rgba(225,6,0,.4);}
+.hist-badge.dnf{background:rgba(150,150,150,.15);color:#aaa;border:1px solid rgba(150,150,150,.4);}
+.hist-badge.pole{background:rgba(255,215,0,.1);color:var(--f1-gold);border:1px solid rgba(255,215,0,.3);}
+.hist-badge.fl{background:rgba(108,142,189,.15);color:#6C8EBF;border:1px solid rgba(108,142,189,.4);}
+.hist-badge.penalty{background:rgba(232,96,28,.15);color:#E8601C;border:1px solid rgba(232,96,28,.4);}
+.hist-positions{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.hist-pos-box{text-align:center;}
+.hist-pos-box .p-label{font-size:10px;color:#666;text-transform:uppercase;letter-spacing:.5px;}
+.hist-pos-box .p-val{font-family:'Orbitron',monospace;font-size:20px;font-weight:900;color:#fff;}
+.hist-arrow{font-size:16px;font-weight:900;}
+.hist-arrow.up{color:#3ECF6E;}
+.hist-arrow.down{color:#E8601C;}
+.hist-arrow.same{color:#666;}
+.hist-pts{margin-left:auto;text-align:right;}
+.hist-pts .p-val{color:var(--f1-gold);}
+.hist-summary{font-size:12.5px;color:#bbb;line-height:1.5;padding-top:8px;border-top:1px solid rgba(255,255,255,.05);}
+.hist-source-link{
+  display:inline-block;margin-top:10px;font-size:11px;font-weight:700;color:var(--f1-gold);
+  text-decoration:none;letter-spacing:.3px;
+}
+.hist-source-link:hover{text-decoration:underline;}
+.hist-loading{text-align:center;color:#666;font-size:13px;padding:40px 20px;}
+
+@media(max-width:768px){
+  .pc-weather-tire{grid-template-columns:1fr;}
+  .pc-cd-unit{width:64px;padding:10px 0;}
+  .pc-cd-unit span{font-size:20px;}
+}
+
 @media(max-width:768px){
   .hero h1{font-size:24px;}
   .comp-selectors{grid-template-columns:1fr;gap:12px;}
@@ -195,15 +319,36 @@ tbody tr:nth-child(3) td{color:#cd7f32;font-weight:700;}
     <span>Comparador 2026</span>
   </div>
   <div style="text-align:right">
-    <div class="header-ano">2026</div>
-    <div id="apiInfo" style="font-size:10px;color:#555;margin-top:2px">Carregando dados...</div>
+    <div class="header-ano">TEMPORADA 2026</div>
+    <div id="apiInfo" style="font-size:10px;color:#555;margin-top:6px">Carregando dados...</div>
+    <div id="lastUpdated" class="header-updated"></div>
   </div>
 </header>
 
 <section class="hero">
+  <div class="season-badge">🏁 DADOS OFICIAIS · TEMPORADA F1 2026</div>
   <h1>Compare os <span>Pilotos</span></h1>
-  <p>Estatísticas detalhadas de qualquer piloto ou equipe da F1 2026</p>
+  <p>Estatísticas detalhadas de qualquer piloto ou equipe da F1 2026, atualizadas automaticamente</p>
   <p id="heroStatus" style="font-size:12px;color:#666;margin-top:8px"></p>
+</section>
+
+<section class="proxima-corrida" id="proximaCorridaSection" style="display:none">
+  <div class="pc-box">
+    <div class="pc-header">
+      <div class="pc-title">🏁 Próxima Corrida</div>
+      <div class="pc-race-name" id="pcRaceName">—</div>
+      <div class="pc-circuit" id="pcCircuit">—</div>
+    </div>
+    <div class="pc-countdown">
+      <div class="pc-cd-unit"><span id="cdDays">00</span><label>Dias</label></div>
+      <div class="pc-cd-unit"><span id="cdHours">00</span><label>Horas</label></div>
+      <div class="pc-cd-unit"><span id="cdMin">00</span><label>Min</label></div>
+      <div class="pc-cd-unit"><span id="cdSec">00</span><label>Seg</label></div>
+    </div>
+    <div class="pc-sessions" id="pcSessions"></div>
+    <div class="pc-weather-tire" id="pcWeatherTire"></div>
+    <div class="pc-note">Horários em Brasília (UTC-3) · Previsão do tempo via Open-Meteo · Recomendação de pneu é uma estimativa, não é dado oficial da Pirelli/FIA</div>
+  </div>
 </section>
 
 <section class="comparador">
@@ -231,6 +376,21 @@ tbody tr:nth-child(3) td{color:#cd7f32;font-weight:700;}
   </div>
 </section>
 
+<section class="historico-section">
+  <h2>📋 Histórico de Corridas</h2>
+  <div class="historico-sub">Resumo de cada etapa dos dois pilotos selecionados acima — largada x resultado, penalidades, pódios e abandonos, gerado automaticamente a partir dos dados oficiais de sessão</div>
+  <div class="hist-columns" id="histColumns">
+    <div class="hist-col">
+      <div class="hist-col-header" id="histNameLeft">—</div>
+      <div class="hist-scroll" id="histContainerLeft"><div class="hist-loading">Carregando histórico de corridas...</div></div>
+    </div>
+    <div class="hist-col">
+      <div class="hist-col-header" id="histNameRight">—</div>
+      <div class="hist-scroll" id="histContainerRight"><div class="hist-loading">Carregando histórico de corridas...</div></div>
+    </div>
+  </div>
+</section>
+
 <section class="tabela-section">
   <h2>Classificação Atual</h2>
   <div class="tab-btns">
@@ -241,24 +401,25 @@ tbody tr:nth-child(3) td{color:#cd7f32;font-weight:700;}
 </section>
 
 <div class="footer" id="footerInfo">Carregando etapa atual...</div>
+<div class="footer" style="padding-top:0;border-top:none">A FIA não disponibiliza uma API pública de dados. Este site usa a Jolpica F1 API (compatível com Ergast, mantida pela comunidade) — em caso de divergência com F1.com/FIA logo após um GP, os dados podem levar algumas horas para sincronizar. Encontrou algum número errado? É só avisar.</div>
 
 <script>
 const drivers = [
-   {pos:1,name:"Kimi Antonelli",team:"Mercedes",pts:204,color:"#27F4D2",
-    wins:6,poles:6,podiums:8,p2:1,p3:1,sprintWins:1,crash:0,mechanic:2,fastestLaps:3,q3:10,
+   {pos:1,name:"Kimi Antonelli",team:"Mercedes",pts:219,color:"#27F4D2",
+    wins:6,poles:6,podiums:9,p2:1,p3:2,sprintWins:1,crash:0,mechanic:1,fastestLaps:6,q3:11,
     bestQuali:1},
-   {pos:2,name:"Lewis Hamilton",team:"Ferrari",pts:159,color:"#E8002D",
+   {pos:2,name:"Lewis Hamilton",team:"Ferrari",pts:169,color:"#E8002D",
     wins:1,poles:0,podiums:5,p2:3,p3:1,sprintWins:0,crash:0,mechanic:0,fastestLaps:1,q3:10,
     bestQuali:2},
-   {pos:3,name:"George Russell",team:"Mercedes",pts:154,color:"#27F4D2",
+   {pos:3,name:"George Russell",team:"Mercedes",pts:160,color:"#27F4D2",
     wins:2,poles:4,podiums:5,p2:1,p3:1,sprintWins:1,crash:2,mechanic:1,fastestLaps:2,q3:10,
     bestQuali:1},
-   {pos:4,name:"Charles Leclerc",team:"Ferrari",pts:126,color:"#E8002D",
+   {pos:4,name:"Charles Leclerc",team:"Ferrari",pts:138,color:"#E8002D",
     wins:1,poles:0,podiums:4,p2:2,p3:1,sprintWins:0,crash:2,mechanic:1,fastestLaps:1,q3:10,
     bestQuali:2},
-   {pos:5,name:"Lando Norris",team:"McLaren",pts:103,color:"#FF8000",
-    wins:0,poles:0,podiums:2,p2:1,p3:1,sprintWins:1,crash:0,mechanic:3,fastestLaps:1,q3:10,
-    bestQuali:3},
+   {pos:5,name:"Lando Norris",team:"McLaren",pts:128,color:"#FF8000",
+    wins:1,poles:1,podiums:2,p2:1,p3:1,sprintWins:1,crash:0,mechanic:3,fastestLaps:1,q3:10,
+    bestQuali:1},
    {pos:6,name:"Oscar Piastri",team:"McLaren",pts:92,color:"#FF8000",
     wins:0,poles:0,podiums:2,p2:1,p3:1,sprintWins:0,crash:2,mechanic:1,fastestLaps:1,q3:10,
     bestQuali:3},
@@ -338,6 +499,9 @@ const teams = [
 ];
 
 let tipoAtual = 'piloto';
+let raceHistoryData = {};
+let raceMetaByRound = {};
+let currentRound = 11;
 
 const API_BASE = 'https://api.jolpi.ca/ergast/f1/2026';
 const DRIVER_MAP = {
@@ -359,32 +523,216 @@ const TEAM_MAP = {
 function findDriver(name){ return drivers.find(d=>d.name===name); }
 function findTeam(name){ return teams.find(t=>t.name===name); }
 
+/* ===== Próxima Corrida: countdown, horários BR, clima e pneus ===== */
+let _pcCountdownInterval = null;
+
+function fmtDataBR(dateObj){
+  return new Intl.DateTimeFormat('pt-BR',{timeZone:'America/Sao_Paulo',weekday:'short',day:'2-digit',month:'2-digit'}).format(dateObj);
+}
+function fmtHoraBR(dateObj){
+  return new Intl.DateTimeFormat('pt-BR',{timeZone:'America/Sao_Paulo',hour:'2-digit',minute:'2-digit',hour12:false}).format(dateObj);
+}
+
+function startCountdown(targetDate){
+  if(_pcCountdownInterval) clearInterval(_pcCountdownInterval);
+  const elD=document.getElementById('cdDays'), elH=document.getElementById('cdHours'),
+        elM=document.getElementById('cdMin'), elS=document.getElementById('cdSec');
+  function tick(){
+    let diff = targetDate - new Date();
+    if(diff<0) diff=0;
+    elD.textContent = String(Math.floor(diff/86400000)).padStart(2,'0');
+    elH.textContent = String(Math.floor(diff%86400000/3600000)).padStart(2,'0');
+    elM.textContent = String(Math.floor(diff%3600000/60000)).padStart(2,'0');
+    elS.textContent = String(Math.floor(diff%60000/1000)).padStart(2,'0');
+  }
+  tick();
+  _pcCountdownInterval = setInterval(tick,1000);
+}
+
+function weatherInfo(code){
+  const map = {
+    0:['☀️','Céu limpo'],1:['🌤️','Poucas nuvens'],2:['⛅','Parcialmente nublado'],3:['☁️','Nublado'],
+    45:['🌫️','Neblina'],48:['🌫️','Neblina com gelo'],
+    51:['🌦️','Garoa fraca'],53:['🌦️','Garoa'],55:['🌦️','Garoa forte'],
+    61:['🌧️','Chuva fraca'],63:['🌧️','Chuva'],65:['🌧️','Chuva forte'],
+    71:['🌨️','Neve fraca'],73:['🌨️','Neve'],75:['🌨️','Neve forte'],
+    80:['🌦️','Pancadas de chuva fracas'],81:['🌧️','Pancadas de chuva'],82:['⛈️','Pancadas de chuva fortes'],
+    95:['⛈️','Trovoada'],96:['⛈️','Trovoada com granizo'],99:['⛈️','Trovoada forte com granizo']
+  };
+  return map[code] || ['🌡️','Condição indefinida'];
+}
+
+function tireRecommendation(w){
+  const rainCodes = [51,53,55,61,63,65,80,81,82,95,96,99];
+  const isRainCode = rainCodes.includes(w.code);
+  if(isRainCode || w.precipProb>=60){
+    return {badge:'wet', label:'Chuva provável',
+      text:'Alta chance de pista molhada. Pneus de <strong>Chuva (Wet)</strong> devem entrar em ação, com <strong>Intermediários</strong> caso a intensidade diminua ao longo da corrida.'};
+  }
+  if(w.precipProb>=30){
+    return {badge:'mixed', label:'Pista mista',
+      text:'Risco moderado de chuva. É provável uma corrida de estratégia mista, com <strong>Intermediários</strong> em standby caso a pista molhe.'};
+  }
+  if(w.tmax>=30){
+    return {badge:'dry', label:'Pista seca e quente',
+      text:'Calor elevado deve aumentar o degradação. Tendência de uso dos compostos mais <strong>duros</strong> (Hard/Medium) para durabilidade.'};
+  }
+  if(w.tmax<=18){
+    return {badge:'dry', label:'Pista seca e fria',
+      text:'Temperatura baixa reduz o degradação. Compostos mais <strong>macios</strong> (Soft/Medium) tendem a ser viáveis por mais tempo.'};
+  }
+  return {badge:'dry', label:'Pista seca',
+    text:'Condições secas e amenas. Equilíbrio entre os compostos <strong>Medium e Hard</strong> é o mais provável.'};
+}
+
+async function loadWeatherForRace(lat, lon, dateStr){
+  try{
+    const target = new Date(dateStr+'T00:00:00');
+    const diffDays = Math.ceil((target - new Date())/86400000);
+    if(diffDays < 0 || diffDays > 15) return null;
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max,windspeed_10m_max&timezone=America%2FSao_Paulo&start_date=${dateStr}&end_date=${dateStr}`;
+    const r = await fetch(url);
+    const j = await r.json();
+    if(!j.daily || !j.daily.time || !j.daily.time.length) return null;
+    return {
+      code: j.daily.weathercode[0],
+      tmax: j.daily.temperature_2m_max[0],
+      tmin: j.daily.temperature_2m_min[0],
+      precipProb: j.daily.precipitation_probability_max[0] ?? 0,
+      wind: j.daily.windspeed_10m_max[0]
+    };
+  }catch(e){ console.error('Falha ao buscar clima:', e.message); return null; }
+}
+
+async function loadNextRaceWidget(racesRes){
+  const section = document.getElementById('proximaCorridaSection');
+  if(!section) return;
+  try{
+    const races = racesRes?.MRData?.RaceTable?.Races || [];
+    const now = new Date();
+    const withDate = races.map(r=>({r, dt:new Date(r.date+'T'+(r.time||'00:00:00Z'))}));
+    const upcoming = withDate.filter(x=>x.dt >= now).sort((a,b)=>a.dt-b.dt);
+    if(!upcoming.length){ section.style.display='none'; return; }
+    const {r: race, dt: raceDateTime} = upcoming[0];
+
+    document.getElementById('pcRaceName').textContent = race.raceName;
+    const loc = race.Circuit?.Location;
+    document.getElementById('pcCircuit').textContent =
+      `${race.Circuit?.circuitName || ''}${loc ? ' · '+loc.locality+', '+loc.country : ''}`;
+
+    const sessionDefs = [
+      {key:'FirstPractice', label:'Treino Livre 1'},
+      {key:'SecondPractice', label:'Treino Livre 2'},
+      {key:'ThirdPractice', label:'Treino Livre 3'},
+      {key:'SprintQualifying', label:'Classificação Sprint'},
+      {key:'Sprint', label:'Corrida Sprint'},
+      {key:'Qualifying', label:'Classificação'},
+    ];
+    let sessionEntries = sessionDefs
+      .filter(s=>race[s.key])
+      .map(s=>({label:s.label, dt:new Date(race[s.key].date+'T'+race[s.key].time), race:false}));
+    sessionEntries.push({label:'Corrida', dt:raceDateTime, race:true});
+    sessionEntries.sort((a,b)=>a.dt-b.dt);
+
+    document.getElementById('pcSessions').innerHTML = sessionEntries.map(s=>`
+      <div class="session-card ${s.race?'race':''}">
+        <div class="s-label">${s.label}</div>
+        <div class="s-date">${fmtDataBR(s.dt)}</div>
+        <div class="s-time">${fmtHoraBR(s.dt)}</div>
+      </div>
+    `).join('');
+
+    startCountdown(raceDateTime);
+
+    const wtEl = document.getElementById('pcWeatherTire');
+    if(loc){
+      const weather = await loadWeatherForRace(loc.lat, loc.long, race.date);
+      if(weather){
+        const [icon, desc] = weatherInfo(weather.code);
+        const tire = tireRecommendation(weather);
+        wtEl.innerHTML = `
+          <div class="weather-card">
+            <h3>🌦️ Clima no dia da corrida</h3>
+            <div class="weather-main">
+              <span class="weather-icon">${icon}</span>
+              <div>
+                <div class="weather-temp">${Math.round(weather.tmin)}° / ${Math.round(weather.tmax)}°C</div>
+                <div class="weather-desc">${desc}</div>
+              </div>
+            </div>
+            <div class="weather-details">
+              Chance de chuva: ${weather.precipProb}%<br>
+              Vento máx.: ${Math.round(weather.wind)} km/h
+            </div>
+          </div>
+          <div class="tire-card">
+            <h3>🏎️ Recomendação de pneus</h3>
+            <span class="tire-badge ${tire.badge}">${tire.label}</span>
+            <div class="tire-rec">${tire.text}</div>
+          </div>
+        `;
+      } else {
+        wtEl.innerHTML = `<div class="pc-unavailable" style="grid-column:1/-1">Previsão do tempo ainda não disponível para esta corrida (fica acessível a partir de ~15 dias antes da data).</div>`;
+      }
+    } else {
+      wtEl.innerHTML = '';
+    }
+
+    section.style.display = 'block';
+  }catch(e){
+    console.error('Falha ao montar widget da próxima corrida:', e.message);
+    section.style.display = 'none';
+  }
+}
+
 async function fetchLiveData(){
   try{
     const heroSt = document.getElementById('heroStatus');
     if(heroSt) heroSt.textContent='Buscando dados atualizados da F1...';
 
-    const [drvRes, conRes, resRes, qualRes, sprintRes, racesRes] = await Promise.all([
+    // Passo 1: dados "leves" e de página única (não sofrem corte de paginação)
+    const [drvRes, conRes, racesRes] = await Promise.all([
       fetch(API_BASE+'/driverstandings.json?limit=100').then(r=>r.json()),
       fetch(API_BASE+'/constructorstandings.json?limit=100').then(r=>r.json()),
-      fetch(API_BASE+'/results.json?limit=1000').then(r=>r.json()),
-      fetch(API_BASE+'/qualifying.json?limit=1000').then(r=>r.json()),
-      fetch(API_BASE+'/sprint.json?limit=1000').then(r=>r.json()).catch(()=>null),
       fetch(API_BASE+'/races.json?limit=100').then(r=>r.json()).catch(()=>null)
     ]);
     const totalRaces = racesRes ? parseInt(racesRes.MRData.total) : null;
+    const officialRoundEarly = parseInt(drvRes.MRData.StandingsTable.StandingsLists[0]?.round) || 0;
+    if(officialRoundEarly>0) currentRound = officialRoundEarly;
+
+    // Passo 2: resultados/classificação buscados ETAPA POR ETAPA (evita o limite de
+    // paginação do endpoint agregado, que só devolve as primeiras ~5 corridas da temporada)
+    const roundFetches = [];
+    for(let rnd=1; rnd<=currentRound; rnd++){
+      roundFetches.push(Promise.all([
+        fetch(`${API_BASE}/${rnd}/results.json?limit=50`).then(r=>r.json()).catch(()=>null),
+        fetch(`${API_BASE}/${rnd}/qualifying.json?limit=50`).then(r=>r.json()).catch(()=>null),
+        fetch(`${API_BASE}/${rnd}/sprint.json?limit=50`).then(r=>r.json()).catch(()=>null)
+      ]));
+    }
+    const roundResults = await Promise.all(roundFetches);
+    const raceResults = roundResults.map(([r])=>r?.MRData?.RaceTable?.Races?.[0]).filter(Boolean);
+    const qualResults = roundResults.map(([,q])=>q?.MRData?.RaceTable?.Races?.[0]).filter(Boolean);
+    const sprintResults = roundResults.map(([,,s])=>s?.MRData?.RaceTable?.Races?.[0]).filter(Boolean);
 
     const drvList = drvRes.MRData.StandingsTable.StandingsLists[0]?.DriverStandings || [];
     const conList = conRes.MRData.StandingsTable.StandingsLists[0]?.ConstructorStandings || [];
-    const raceResults = resRes.MRData.RaceTable?.Races || [];
-    const qualResults = qualRes.MRData.RaceTable?.Races || [];
-    const sprintResults = sprintRes?.MRData.RaceTable?.Races || [];
 
     const stats = {};
-    Object.values(DRIVER_MAP).forEach(n=>{ stats[n]={wins:0,poles:0,podiums:0,p2:0,p3:0,sprintWins:0,fastestLaps:0,q3:0,bestQuali:99}; });
+    Object.values(DRIVER_MAP).forEach(n=>{ stats[n]={wins:0,poles:0,podiums:0,p2:0,p3:0,sprintWins:0,fastestLaps:0,q3:0,bestQuali:99,crash:0,mechanic:0}; });
 
     const teamStats = {};
-    Object.values(TEAM_MAP).forEach(n=>{ teamStats[n]={poles:0,podiums:0,sprintWins:0}; });
+    Object.values(TEAM_MAP).forEach(n=>{ teamStats[n]={poles:0,podiums:0,sprintWins:0,crash:0,mechanic:0}; });
+
+    // Classifica o motivo de não-finalização a partir do campo "status" da API
+    function classifyStatus(status){
+      if(!status) return null;
+      if(status==='Finished' || /^\+\d+ Lap/.test(status)) return 'finished';
+      if(['Disqualified','Did not qualify','Did not start','Withdrew','Excluded'].includes(status)) return 'other';
+      const crashKeywords = ['Accident','Collision','Spun off','Damage','Debris'];
+      if(crashKeywords.some(k=>status.includes(k))) return 'crash';
+      return 'mechanic';
+    }
 
     raceResults.forEach(race=>{
       if(!race.Results) return;
@@ -392,14 +740,21 @@ async function fetchLiveData(){
         const name = DRIVER_MAP[res.Driver.driverId];
         const teamName = TEAM_MAP[res.Constructor?.constructorId];
         const pos = parseInt(res.position);
+        const cls = classifyStatus(res.status);
         if(name && stats[name]){
           if(pos===1) stats[name].wins++;
           if(pos<=3) stats[name].podiums++;
           if(pos===2) stats[name].p2++;
           if(pos===3) stats[name].p3++;
           if(res.FastestLap && res.FastestLap.rank==='1') stats[name].fastestLaps++;
+          if(cls==='crash') stats[name].crash++;
+          if(cls==='mechanic') stats[name].mechanic++;
         }
-        if(teamName && teamStats[teamName] && pos<=3) teamStats[teamName].podiums++;
+        if(teamName && teamStats[teamName]){
+          if(pos<=3) teamStats[teamName].podiums++;
+          if(cls==='crash') teamStats[teamName].crash++;
+          if(cls==='mechanic') teamStats[teamName].mechanic++;
+        }
       });
     });
 
@@ -409,6 +764,7 @@ async function fetchLiveData(){
         const teamName = TEAM_MAP[res.Constructor?.constructorId];
         const pos = parseInt(res.position);
         if(name && stats[name]){
+          // Pole = P1 na classificação (mantém a marca mesmo com penalidade de grid aplicada depois)
           if(pos===1) stats[name].poles++;
           if(pos<stats[name].bestQuali) stats[name].bestQuali=pos;
           if(res.Q3 && res.Q3!=='') stats[name].q3++;
@@ -427,6 +783,18 @@ async function fetchLiveData(){
       });
     });
 
+    // Checagem de integridade: agora buscamos etapa por etapa (não mais um endpoint agregado
+    // sujeito a corte de paginação), mas ainda vale confirmar que cada rodada individual
+    // respondeu corretamente antes de sobrescrever os dados revisados manualmente.
+    const officialRound = currentRound;
+    const roundsWithResults = new Set(raceResults.filter(r=>r.Results&&r.Results.length).map(r=>r.round)).size;
+    const roundsWithQuali = new Set(qualResults.filter(r=>r.QualifyingResults&&r.QualifyingResults.length).map(r=>r.round)).size;
+    const resultsComplete = officialRound>0 && roundsWithResults>=officialRound;
+    const qualiComplete = officialRound>0 && roundsWithQuali>=officialRound;
+    if(!resultsComplete || !qualiComplete){
+      console.warn(`Feed da API incompleto (resultados: ${roundsWithResults}/${officialRound}, quali: ${roundsWithQuali}/${officialRound}) — mantendo dados locais revisados para estatísticas derivadas.`);
+    }
+
     drvList.forEach(d=>{
       const name = DRIVER_MAP[d.Driver.driverId];
       const drv = findDriver(name);
@@ -434,14 +802,20 @@ async function fetchLiveData(){
       drv.pts = parseInt(d.points);
       drv.pos = parseInt(d.position);
       drv.wins = parseInt(d.wins) || stats[name].wins;
-      drv.poles = stats[name].poles;
-      drv.podiums = stats[name].podiums;
-      drv.p2 = stats[name].p2;
-      drv.p3 = stats[name].p3;
+      if(resultsComplete){
+        drv.podiums = stats[name].podiums;
+        drv.p2 = stats[name].p2;
+        drv.p3 = stats[name].p3;
+        drv.fastestLaps = stats[name].fastestLaps;
+        drv.crash = stats[name].crash;
+        drv.mechanic = stats[name].mechanic;
+      }
+      if(qualiComplete){
+        drv.poles = stats[name].poles;
+        drv.q3 = stats[name].q3;
+        if(stats[name].bestQuali<99) drv.bestQuali = stats[name].bestQuali;
+      }
       drv.sprintWins = stats[name].sprintWins;
-      drv.fastestLaps = stats[name].fastestLaps;
-      drv.q3 = stats[name].q3;
-      if(stats[name].bestQuali<99) drv.bestQuali = stats[name].bestQuali;
     });
 
     conList.forEach(c=>{
@@ -452,11 +826,69 @@ async function fetchLiveData(){
       team.pos = parseInt(c.position);
       team.wins = parseInt(c.wins);
       if(teamStats[name]){
-        team.poles = teamStats[name].poles;
-        team.podiums = teamStats[name].podiums;
+        if(qualiComplete) team.poles = teamStats[name].poles;
+        if(resultsComplete){
+          team.podiums = teamStats[name].podiums;
+          team.crash = teamStats[name].crash;
+          team.mechanic = teamStats[name].mechanic;
+        }
         team.sprintWins = teamStats[name].sprintWins;
       }
     });
+
+    // ===== Histórico de corridas por piloto (para o balão de resumo por etapa) =====
+    const qualPosByRound = {};
+    qualResults.forEach(race=>{
+      qualPosByRound[race.round] = {};
+      race.QualifyingResults.forEach(res=>{
+        const name = DRIVER_MAP[res.Driver.driverId];
+        if(name) qualPosByRound[race.round][name] = parseInt(res.position);
+      });
+    });
+
+    const sprintByRound = {};
+    sprintResults.forEach(race=>{
+      sprintByRound[race.round] = {};
+      (race.SprintResults||[]).forEach(res=>{
+        const name = DRIVER_MAP[res.Driver.driverId];
+        if(name) sprintByRound[race.round][name] = parseInt(res.position);
+      });
+    });
+
+    const newRaceHistory = {};
+    Object.values(DRIVER_MAP).forEach(n=>{ newRaceHistory[n]=[]; });
+    const newRaceMeta = {};
+
+    raceResults.forEach(race=>{
+      if(!race.Results) return;
+      newRaceMeta[race.round] = {
+        raceName: race.raceName, date: race.date,
+        country: race.Circuit?.Location?.country || ''
+      };
+      race.Results.forEach(res=>{
+        const name = DRIVER_MAP[res.Driver.driverId];
+        if(!name || !newRaceHistory[name]) return;
+        const finish = parseInt(res.position);
+        const grid = parseInt(res.grid);
+        const qualPos = qualPosByRound[race.round]?.[name] ?? null;
+        newRaceHistory[name].push({
+          round: parseInt(race.round),
+          raceName: race.raceName,
+          date: race.date,
+          country: race.Circuit?.Location?.country || '',
+          grid: grid,
+          qualPos: qualPos,
+          finish: finish,
+          points: parseFloat(res.points) || 0,
+          status: res.status,
+          fastestLap: !!(res.FastestLap && res.FastestLap.rank==='1'),
+          sprintFinish: sprintByRound[race.round]?.[name] ?? null
+        });
+      });
+    });
+    Object.values(newRaceHistory).forEach(arr=>arr.sort((a,b)=>b.round-a.round));
+    raceHistoryData = newRaceHistory;
+    raceMetaByRound = newRaceMeta;
 
     drivers.sort((a,b)=>a.pos-b.pos);
     teams.sort((a,b)=>a.pos-b.pos);
@@ -466,19 +898,27 @@ async function fetchLiveData(){
     populateSelects();
     comparar();
     renderTabela('pilotos');
+    loadNextRaceWidget(racesRes);
 
     const round = drvRes.MRData.StandingsTable.StandingsLists[0]?.round;
     const info = document.getElementById('apiInfo');
-    if(info) info.textContent='Dados atualizados automaticamente (Jolpica F1 API · Etapa '+round+')';
+    if(info) info.textContent='Temporada 2026 · Dados atualizados automaticamente (Jolpica F1 API · Etapa '+round+')';
+    const lastUpd = document.getElementById('lastUpdated');
+    if(lastUpd){
+      const now = new Date();
+      lastUpd.textContent = 'Sincronizado às '+fmtHoraBR(now)+' (Brasília)';
+    }
     if(heroSt) heroSt.textContent='';
     const footer = document.getElementById('footerInfo');
-    if(footer && round) footer.textContent='Dados ao vivo via Jolpica F1 API · '+round+(totalRaces?' de '+totalRaces:'')+' etapas disputadas · atualiza a cada acesso à página';
+    if(footer && round) footer.textContent='Temporada 2026 · Dados ao vivo via Jolpica F1 API · '+round+(totalRaces?' de '+totalRaces:'')+' etapas disputadas · atualiza a cada acesso à página';
   }catch(e){
     console.error('API fetch failed:', e.message, e);
     const info = document.getElementById('apiInfo');
-    if(info) info.textContent='Dados locais (API: '+e.message.substring(0,50)+')';
+    if(info) info.textContent='Temporada 2026 · Dados locais (API: '+e.message.substring(0,50)+')';
     const heroSt = document.getElementById('heroStatus');
-    if(heroSt) heroSt.textContent='Modo offline - dados locais';
+    if(heroSt) heroSt.textContent='Modo offline - dados locais podem estar desatualizados';
+    const histC = document.getElementById('histContainer');
+    if(histC) histC.innerHTML = '<div class="hist-loading">Histórico de corridas indisponível no momento (modo offline). Tente recarregar a página.</div>';
   }
 }
 
@@ -521,7 +961,7 @@ function comparar(){
 
   if(tipoAtual==='piloto'){
     const dnfA = d1.crash+d1.mechanic, dnfB = d2.crash+d2.mechanic;
-    const finA = 10-dnfA, finB = 10-dnfB;
+    const finA = currentRound-dnfA, finB = currentRound-dnfB;
     const s = [
       {label:'Vitórias',a:d1.wins,b:d2.wins},
       {label:'Poles',a:d1.poles,b:d2.poles},
@@ -655,6 +1095,8 @@ function comparar(){
     </div>
     ${statsHTML}
   `;
+
+  if(typeof renderHistoricoComparativo==='function') renderHistoricoComparativo();
 }
 
 function showTab(tab,el){
@@ -742,6 +1184,141 @@ function renderTabela(tab,listOverride){
 
 populateSelects();
 renderTabela('pilotos');
+
+/* ===== Histórico de Corridas por piloto (lado a lado, ligado ao comparador) ===== */
+function statusReasonPT(status){
+  if(!status) return 'motivo não informado';
+  if(status==='Finished' || /^\+\d+ Lap/.test(status)) return null;
+  const map = {
+    'Accident':'batida', 'Collision':'colisão', 'Spun off':'rodada',
+    'Engine':'problema no motor', 'Gearbox':'problema no câmbio',
+    'Hydraulics':'falha hidráulica', 'Electrical':'falha elétrica',
+    'Brakes':'falha nos freios', 'Suspension':'falha na suspensão',
+    'Puncture':'furo de pneu', 'Retired':'abandono técnico',
+    'Mechanical':'problema mecânico', 'Power Unit':'falha na unidade de potência',
+    'Disqualified':'desclassificado', 'Withdrew':'retirado antes da corrida'
+  };
+  for(const k in map){ if(status.includes(k)) return map[k]; }
+  return status.toLowerCase();
+}
+
+function buildSummary(r){
+  const parts = [];
+  const dnfReason = statusReasonPT(r.status);
+
+  if(r.qualPos && r.grid && r.grid > r.qualPos){
+    parts.push(`Classificou em P${r.qualPos}, mas largou em P${r.grid} — penalidade de grid aplicada.`);
+  } else if(r.qualPos){
+    parts.push(`Largou da posição que conquistou na classificação (P${r.qualPos}).`);
+  }
+
+  if(dnfReason){
+    parts.push(`Não completou a corrida: ${dnfReason}.`);
+  } else if(r.grid && r.finish){
+    const diff = r.grid - r.finish;
+    if(diff > 0) parts.push(`Ganhou ${diff} posição${diff>1?'ões':''} durante a corrida (de P${r.grid} para P${r.finish}).`);
+    else if(diff < 0) parts.push(`Perdeu ${Math.abs(diff)} posição${Math.abs(diff)>1?'ões':''} durante a corrida (de P${r.grid} para P${r.finish}).`);
+    else parts.push(`Manteve a posição de largada até o fim (P${r.finish}).`);
+  }
+
+  if(r.finish===1) parts.push('🏆 Vitória na etapa.');
+  else if(r.finish<=3 && !dnfReason) parts.push('Terminou no pódio.');
+
+  if(r.fastestLap) parts.push('Marcou a volta mais rápida da corrida.');
+  if(r.sprintFinish) parts.push(`Sprint: terminou em P${r.sprintFinish}.`);
+  if(r.points>0) parts.push(`Somou ${r.points} ponto${r.points!==1?'s':''}.`);
+  else if(!dnfReason) parts.push('Não pontuou nesta etapa.');
+
+  return parts.join(' ');
+}
+
+function motorsportBrasilLink(raceName){
+  const q = encodeURIComponent(`site:motorsport.uol.com.br resultado corrida ${raceName} 2026`);
+  return `https://www.google.com/search?q=${q}`;
+}
+
+function renderHistorico(driverName, containerId){
+  const container = document.getElementById(containerId);
+  if(!container) return;
+  const races = raceHistoryData[driverName];
+  if(!races){
+    container.innerHTML = Object.keys(raceHistoryData).length
+      ? '<div class="hist-loading">Nenhuma corrida registrada ainda para este piloto em 2026.</div>'
+      : '<div class="hist-loading">Carregando histórico de corridas...</div>';
+    return;
+  }
+  if(!races.length){
+    container.innerHTML = '<div class="hist-loading">Nenhuma corrida registrada ainda para este piloto em 2026.</div>';
+    return;
+  }
+  container.innerHTML = races.map(r=>{
+    const dnfReason = statusReasonPT(r.status);
+    const isWin = r.finish===1;
+    const isPodium = r.finish<=3 && !dnfReason;
+    const cardClass = dnfReason ? 'dnf' : (isWin ? 'win' : (isPodium ? 'podium' : ''));
+
+    let badges = '';
+    if(isWin) badges += `<span class="hist-badge win">🏆 Vitória</span>`;
+    else if(isPodium) badges += `<span class="hist-badge podium">🥉 Pódio</span>`;
+    if(dnfReason) badges += `<span class="hist-badge dnf">🚫 DNF</span>`;
+    if(r.qualPos===1) badges += `<span class="hist-badge pole">🎯 Pole</span>`;
+    if(r.grid && r.qualPos && r.grid>r.qualPos) badges += `<span class="hist-badge penalty">⚠️ Penalidade grid</span>`;
+    if(r.fastestLap) badges += `<span class="hist-badge fl">⚡ Volta rápida</span>`;
+
+    const gridVal = r.grid || '—';
+    const finishVal = dnfReason ? 'DNF' : (r.finish || '—');
+    let arrowClass='same', arrowChar='=';
+    if(!dnfReason && r.grid && r.finish){
+      if(r.finish < r.grid){ arrowClass='up'; arrowChar='▲'; }
+      else if(r.finish > r.grid){ arrowClass='down'; arrowChar='▼'; }
+    }
+
+    return `<div class="hist-card ${cardClass}">
+      <div class="hist-top">
+        <div>
+          <div class="hist-race-name">Etapa ${r.round} · ${r.raceName}</div>
+          <div class="hist-race-date">${r.country}${r.date?' · '+r.date:''}</div>
+        </div>
+        <div class="hist-badges">${badges}</div>
+      </div>
+      <div class="hist-positions">
+        <div class="hist-pos-box"><div class="p-label">Grid</div><div class="p-val">${gridVal}</div></div>
+        <div class="hist-arrow ${arrowClass}">${arrowChar}</div>
+        <div class="hist-pos-box"><div class="p-label">Final</div><div class="p-val">${finishVal}</div></div>
+        <div class="hist-pts"><div class="p-label">Pontos</div><div class="p-val">${r.points}</div></div>
+      </div>
+      <div class="hist-summary">${buildSummary(r)}</div>
+      <a class="hist-source-link" href="${motorsportBrasilLink(r.raceName)}" target="_blank" rel="noopener">Ver cobertura completa no Motorsport.com Brasil ↗</a>
+    </div>`;
+  }).join('');
+}
+
+function renderHistoricoComparativo(){
+  const section = document.getElementById('histColumns');
+  if(!section) return;
+  const nameLeftEl = document.getElementById('histNameLeft');
+  const nameRightEl = document.getElementById('histNameRight');
+  const contLeft = document.getElementById('histContainerLeft');
+  const contRight = document.getElementById('histContainerRight');
+
+  if(tipoAtual!=='piloto'){
+    nameLeftEl.textContent = '—';
+    nameRightEl.textContent = '—';
+    contLeft.innerHTML = '<div class="hist-loading">Histórico individual disponível apenas na comparação de pilotos.</div>';
+    contRight.innerHTML = '<div class="hist-loading">Histórico individual disponível apenas na comparação de pilotos.</div>';
+    return;
+  }
+
+  const i1 = parseInt(document.getElementById('select1').value);
+  const i2 = parseInt(document.getElementById('select2').value);
+  const d1 = drivers[i1], d2 = drivers[i2];
+  if(!d1 || !d2) return;
+
+  nameLeftEl.textContent = d1.name;
+  nameRightEl.textContent = d2.name;
+  renderHistorico(d1.name, 'histContainerLeft');
+  renderHistorico(d2.name, 'histContainerRight');
+}
 </script>
 </body>
 </html>
