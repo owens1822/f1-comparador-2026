@@ -523,6 +523,99 @@ const TEAM_MAP = {
 function findDriver(name){ return drivers.find(d=>d.name===name); }
 function findTeam(name){ return teams.find(t=>t.name===name); }
 
+/* Um piloto que termina voltas atrás do líder ainda é classificado como "terminou a prova" —
+   não é um abandono (DNF). A API às vezes representa isso como "+1 Lap"/"+2 Laps", mas em
+   alguns feeds vem apenas como a palavra "Lapped". O código antigo só reconhecia o primeiro
+   formato, então corridas com o segundo formato apareciam incorretamente como "DNF" (motivo
+   "lapped") tanto no histórico por etapa quanto nas contagens de falha mecânica/batida.
+   Conferido contra fontes confiáveis (Formula1.com, the-race.com, ESPN, Grande Prêmio):
+   Bortoleto terminou classificado em P13 no GP da Holanda 2026 e P11 no GP da Hungria 2026 —
+   nenhum dos dois foi abandono. */
+function isClassifiedFinishStatus(status){
+  if(!status) return false;
+  const s = status.trim();
+  if(/^finished$/i.test(s)) return true;
+  if(/^\+\s*\d+\s*laps?$/i.test(s)) return true; // "+1 Lap", "+2 Laps"
+  if(/^lapped$/i.test(s)) return true; // variante usada por alguns feeds Ergast-compatíveis
+  return false;
+}
+
+/* ===== Camada de acesso à API com retry + respeito ao rate limit (evita dados "aleatórios") =====
+   A Jolpica/Ergast permite no máximo 4 req/s (burst) e 500 req/h (sustained). O código antigo
+   disparava até 36 requisições simultâneas (Promise.all de 11 etapas x 3 endpoints), o que
+   estourava o burst limit e fazia a API responder 429 para parte delas. Essas falhas eram
+   engolidas por um .catch(()=>null) e a corrida correspondente simplesmente sumia do histórico
+   — por isso etapas diferentes "faltavam" a cada recarregamento, de forma imprevisível. */
+
+async function fetchJSONWithRetry(url, retries=4, baseDelayMs=600){
+  for(let attempt=0; attempt<=retries; attempt++){
+    try{
+      const res = await fetch(url);
+      if(res.status===429){
+        const retryAfterHeader = res.headers.get('Retry-After');
+        const wait = retryAfterHeader ? parseFloat(retryAfterHeader)*1000 : baseDelayMs*Math.pow(2,attempt);
+        await new Promise(r=>setTimeout(r, wait));
+        continue; // tenta de novo sem gastar uma tentativa "de erro"
+      }
+      if(!res.ok) throw new Error('HTTP '+res.status);
+      return await res.json();
+    }catch(e){
+      if(attempt===retries){
+        console.warn('Falha definitiva ao buscar', url, e.message);
+        return null;
+      }
+      await new Promise(r=>setTimeout(r, baseDelayMs*Math.pow(2,attempt)));
+    }
+  }
+  return null;
+}
+
+// Busca uma lista de URLs em pequenos lotes espaçados no tempo, para nunca passar de ~3 req/s
+// (fica com margem de segurança abaixo do burst limit de 4 req/s da API).
+async function fetchInBatches(urls, batchSize=3, spacingMs=900){
+  const results = new Array(urls.length);
+  for(let i=0; i<urls.length; i+=batchSize){
+    const batch = urls.slice(i, i+batchSize);
+    const batchResults = await Promise.all(batch.map(u=>fetchJSONWithRetry(u)));
+    batchResults.forEach((r,j)=>{ results[i+j] = r; });
+    if(i+batchSize<urls.length) await new Promise(r=>setTimeout(r, spacingMs));
+  }
+  return results;
+}
+
+/* ===== Snapshot local (localStorage): guarda o último conjunto de dados 100% completo =====
+   Só é gravado quando resultsComplete && qualiComplete (ver fetchLiveData). Isso garante que
+   o cache nunca fica "corrompido" com uma etapa faltando — na pior das hipóteses, o site mostra
+   dados de uma sincronização anterior completa, nunca uma mistura aleatória e incompleta. */
+const SNAPSHOT_KEY = 'f1_2026_snapshot_v2'; // v2: corrige status "Lapped" sendo lido como DNF
+
+function loadSnapshotCache(){
+  try{
+    const raw = localStorage.getItem(SNAPSHOT_KEY);
+    if(!raw) return null;
+    const parsed = JSON.parse(raw);
+    if(!parsed || !Array.isArray(parsed.drivers) || !Array.isArray(parsed.teams)) return null;
+    return parsed;
+  }catch(e){ return null; }
+}
+
+function saveSnapshotCache(){
+  try{
+    localStorage.setItem(SNAPSHOT_KEY, JSON.stringify({
+      drivers, teams, raceHistoryData, raceMetaByRound, currentRound,
+      savedAt: Date.now()
+    }));
+  }catch(e){ /* localStorage indisponível/cheio — segue sem cache, sem quebrar a página */ }
+}
+
+function applySnapshotCache(snap){
+  snap.drivers.forEach(sd=>{ const d=findDriver(sd.name); if(d) Object.assign(d, sd); });
+  snap.teams.forEach(st=>{ const t=findTeam(st.name); if(t) Object.assign(t, st); });
+  raceHistoryData = snap.raceHistoryData || {};
+  raceMetaByRound = snap.raceMetaByRound || {};
+  if(snap.currentRound) currentRound = snap.currentRound;
+}
+
 /* ===== Próxima Corrida: countdown, horários BR, clima e pneus ===== */
 let _pcCountdownInterval = null;
 
@@ -701,19 +794,25 @@ async function fetchLiveData(){
     if(officialRoundEarly>0) currentRound = officialRoundEarly;
 
     // Passo 2: resultados/classificação buscados ETAPA POR ETAPA (evita o limite de
-    // paginação do endpoint agregado, que só devolve as primeiras ~5 corridas da temporada)
-    const roundFetches = [];
+    // paginação do endpoint agregado, que só devolve as primeiras ~5 corridas da temporada).
+    // IMPORTANTE: as até 33 chamadas (11 etapas x 3 endpoints) NÃO são mais disparadas todas de
+    // uma vez — isso estourava o burst limit de 4 req/s da API e gerava 429s aleatórios.
+    // Agora vão em lotes pequenos e espaçados, com retry automático em caso de 429/erro de rede.
+    const roundUrls = [];
     for(let rnd=1; rnd<=currentRound; rnd++){
-      roundFetches.push(Promise.all([
-        fetch(`${API_BASE}/${rnd}/results.json?limit=50`).then(r=>r.json()).catch(()=>null),
-        fetch(`${API_BASE}/${rnd}/qualifying.json?limit=50`).then(r=>r.json()).catch(()=>null),
-        fetch(`${API_BASE}/${rnd}/sprint.json?limit=50`).then(r=>r.json()).catch(()=>null)
-      ]));
+      roundUrls.push({rnd, type:'results',    url:`${API_BASE}/${rnd}/results.json?limit=50`});
+      roundUrls.push({rnd, type:'qualifying', url:`${API_BASE}/${rnd}/qualifying.json?limit=50`});
+      roundUrls.push({rnd, type:'sprint',     url:`${API_BASE}/${rnd}/sprint.json?limit=50`});
     }
-    const roundResults = await Promise.all(roundFetches);
-    const raceResults = roundResults.map(([r])=>r?.MRData?.RaceTable?.Races?.[0]).filter(Boolean);
-    const qualResults = roundResults.map(([,q])=>q?.MRData?.RaceTable?.Races?.[0]).filter(Boolean);
-    const sprintResults = roundResults.map(([,,s])=>s?.MRData?.RaceTable?.Races?.[0]).filter(Boolean);
+    const roundResponses = await fetchInBatches(roundUrls.map(u=>u.url), 3, 900);
+    const raceResults = [], qualResults = [], sprintResults = [];
+    roundUrls.forEach((u,idx)=>{
+      const race = roundResponses[idx]?.MRData?.RaceTable?.Races?.[0];
+      if(!race) return;
+      if(u.type==='results') raceResults.push(race);
+      else if(u.type==='qualifying') qualResults.push(race);
+      else sprintResults.push(race);
+    });
 
     const drvList = drvRes.MRData.StandingsTable.StandingsLists[0]?.DriverStandings || [];
     const conList = conRes.MRData.StandingsTable.StandingsLists[0]?.ConstructorStandings || [];
@@ -727,7 +826,7 @@ async function fetchLiveData(){
     // Classifica o motivo de não-finalização a partir do campo "status" da API
     function classifyStatus(status){
       if(!status) return null;
-      if(status==='Finished' || /^\+\d+ Lap/.test(status)) return 'finished';
+      if(isClassifiedFinishStatus(status)) return 'finished';
       if(['Disqualified','Did not qualify','Did not start','Withdrew','Excluded'].includes(status)) return 'other';
       const crashKeywords = ['Accident','Collision','Spun off','Damage','Debris'];
       if(crashKeywords.some(k=>status.includes(k))) return 'crash';
@@ -887,13 +986,28 @@ async function fetchLiveData(){
       });
     });
     Object.values(newRaceHistory).forEach(arr=>arr.sort((a,b)=>b.round-a.round));
-    raceHistoryData = newRaceHistory;
-    raceMetaByRound = newRaceMeta;
+    // Só substitui o histórico exibido se este ciclo trouxe TODAS as etapas; caso contrário,
+    // mantém o que já estava na tela (dado completo anterior) em vez de mostrar etapas faltando.
+    if(resultsComplete){
+      raceHistoryData = newRaceHistory;
+      raceMetaByRound = newRaceMeta;
+    } else if(!Object.keys(raceHistoryData).some(k=>raceHistoryData[k]?.length)){
+      // Não há nenhum dado completo anterior (nem em cache) — melhor mostrar o parcial que nada.
+      raceHistoryData = newRaceHistory;
+      raceMetaByRound = newRaceMeta;
+      console.warn('Histórico de corridas exibido está PARCIAL (sem dado completo anterior disponível).');
+    } else {
+      console.warn('Fetch incompleto nesta sincronização — mantendo o último histórico de corridas completo.');
+    }
 
     drivers.sort((a,b)=>a.pos-b.pos);
     teams.sort((a,b)=>a.pos-b.pos);
     drivers.forEach((d,i)=>d.pos=i+1);
     teams.forEach((t,i)=>t.pos=i+1);
+
+    // Só grava o snapshot em cache quando o ciclo veio 100% completo — garante que o cache
+    // nunca guarda um estado com corridas faltando.
+    if(resultsComplete && qualiComplete) saveSnapshotCache();
 
     populateSelects();
     comparar();
@@ -902,11 +1016,16 @@ async function fetchLiveData(){
 
     const round = drvRes.MRData.StandingsTable.StandingsLists[0]?.round;
     const info = document.getElementById('apiInfo');
-    if(info) info.textContent='Temporada 2026 · Dados atualizados automaticamente (Jolpica F1 API · Etapa '+round+')';
+    const syncOk = resultsComplete && qualiComplete;
+    if(info) info.textContent = syncOk
+      ? 'Temporada 2026 · Dados atualizados automaticamente (Jolpica F1 API · Etapa '+round+')'
+      : 'Temporada 2026 · Sincronização parcial nesta atualização — mantendo o último histórico completo (Etapa '+round+')';
     const lastUpd = document.getElementById('lastUpdated');
     if(lastUpd){
       const now = new Date();
-      lastUpd.textContent = 'Sincronizado às '+fmtHoraBR(now)+' (Brasília)';
+      lastUpd.textContent = syncOk
+        ? 'Sincronizado às '+fmtHoraBR(now)+' (Brasília)'
+        : 'Última sincronização completa mantida (tentativa das '+fmtHoraBR(now)+' ficou parcial)';
     }
     if(heroSt) heroSt.textContent='';
     const footer = document.getElementById('footerInfo');
@@ -921,6 +1040,11 @@ async function fetchLiveData(){
     if(histC) histC.innerHTML = '<div class="hist-loading">Histórico de corridas indisponível no momento (modo offline). Tente recarregar a página.</div>';
   }
 }
+
+// Aplica o último snapshot 100% completo (se existir) ANTES de buscar dados novos, para a
+// primeira renderização da página já sair correta em vez de usar os valores fixos de exemplo.
+const cachedSnapshot = loadSnapshotCache();
+if(cachedSnapshot) applySnapshotCache(cachedSnapshot);
 
 fetchLiveData();
 
@@ -1188,7 +1312,7 @@ renderTabela('pilotos');
 /* ===== Histórico de Corridas por piloto (lado a lado, ligado ao comparador) ===== */
 function statusReasonPT(status){
   if(!status) return 'motivo não informado';
-  if(status==='Finished' || /^\+\d+ Lap/.test(status)) return null;
+  if(isClassifiedFinishStatus(status)) return null;
   const map = {
     'Accident':'batida', 'Collision':'colisão', 'Spun off':'rodada',
     'Engine':'problema no motor', 'Gearbox':'problema no câmbio',
