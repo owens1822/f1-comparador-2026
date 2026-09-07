@@ -234,6 +234,46 @@ tbody tr:nth-child(3) td{color:#cd7f32;font-weight:700;}
 .pc-note{font-size:11px;color:#555;text-align:center;margin-top:16px;}
 .pc-unavailable{text-align:center;color:#666;font-size:13px;padding:20px;}
 
+/* ===== Classificação / Grid de Largada ===== */
+.grid-largada-section{max-width:1100px;margin:0 auto;padding:0 24px 40px;}
+.gl-note{font-size:12px;color:#888;text-align:center;margin-bottom:18px;}
+.gl-group-banner{
+  text-align:center;font-size:11px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;
+  color:var(--f1-gold);background:rgba(255,199,0,.08);border:1px solid rgba(255,199,0,.25);
+  border-radius:8px;padding:6px 10px;margin-bottom:10px;
+}
+.gl-table{display:flex;flex-direction:column;gap:6px;}
+.gl-row{
+  display:grid;grid-template-columns:42px 1fr 150px 90px 90px;align-items:center;gap:12px;
+  background:var(--f1-darker);border:1px solid var(--f1-gray);border-radius:10px;
+  padding:10px 14px;
+}
+.gl-row.has-sectors{grid-template-columns:36px 1fr 64px 64px 64px 150px 90px 90px;}
+.gl-row.gl-header{background:transparent;border:none;padding:0 14px;margin-bottom:2px;}
+.gl-row.gl-header > div{font-size:10px;color:#666;text-transform:uppercase;letter-spacing:.5px;font-weight:700;}
+.gl-row.penalized{border-color:rgba(255,159,26,.5);background:rgba(255,159,26,.06);}
+.gl-pos{font-family:'Orbitron',monospace;font-size:18px;font-weight:900;color:#fff;text-align:center;}
+.gl-driver{display:flex;align-items:center;gap:10px;min-width:0;}
+.gl-team-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.gl-driver-name{font-weight:700;color:#fff;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.gl-team-name{font-size:11px;color:#888;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.gl-penalty{display:flex;align-items:center;justify-content:center;}
+.gl-penalty-pill{font-size:11px;color:#FF9F1A;text-align:center;background:rgba(255,159,26,.12);
+  border:1px solid rgba(255,159,26,.35);border-radius:6px;padding:3px 8px;white-space:nowrap;}
+.gl-penalty-dash{color:#444;font-size:12px;}
+.gl-time{font-family:'Orbitron',monospace;font-size:14px;color:var(--f1-gold);text-align:right;white-space:nowrap;}
+.gl-gap{font-family:'Orbitron',monospace;font-size:13px;color:#aaa;text-align:right;white-space:nowrap;}
+.gl-sector{font-family:'Orbitron',monospace;font-size:12px;color:#ccc;text-align:center;white-space:nowrap;}
+.gl-sector.dash{color:#555;}
+.gl-sector.purple{color:#C400FF;font-weight:900;}
+.gl-sector.green{color:#00C853;font-weight:900;}
+.gl-sector.yellow{color:#FFD700;font-weight:900;}
+@media(max-width:640px){
+  .gl-row{grid-template-columns:32px 1fr 60px 60px;}
+  .gl-row.has-sectors{grid-template-columns:32px 1fr 60px 60px;}
+  .gl-penalty,.gl-sector{display:none;}
+}
+
 /* ===== Histórico de Corridas ===== */
 .historico-section{max-width:1100px;margin:0 auto;padding:20px 24px 60px;}
 .historico-section h2{
@@ -351,6 +391,18 @@ tbody tr:nth-child(3) td{color:#cd7f32;font-weight:700;}
   </div>
 </section>
 
+<section class="grid-largada-section" id="gridLargadaSection" style="display:none">
+  <div class="pc-box">
+    <div class="pc-header">
+      <div class="pc-title">🏁 Classificação / Grid de Largada</div>
+      <div class="pc-race-name" id="glRaceName">—</div>
+      <div class="pc-circuit" id="glCircuit">—</div>
+    </div>
+    <div class="gl-note" id="glNote"></div>
+    <div class="gl-table" id="glTable"></div>
+  </div>
+</section>
+
 <section class="comparador">
   <div class="comp-box">
     <div class="comp-title">⚡ Ferramenta de Comparação</div>
@@ -377,8 +429,8 @@ tbody tr:nth-child(3) td{color:#cd7f32;font-weight:700;}
 </section>
 
 <section class="historico-section">
-  <h2>📋 Histórico de Corridas</h2>
-  <div class="historico-sub">Resumo de cada etapa dos dois pilotos selecionados acima — largada x resultado, penalidades, pódios e abandonos, gerado automaticamente a partir dos dados oficiais de sessão</div>
+  <h2>📋 Última Corrida</h2>
+  <div class="historico-sub">Resumo da etapa mais recente dos dois pilotos selecionados acima — largada x resultado, penalidades, pódios e abandonos, gerado automaticamente a partir dos dados oficiais de sessão</div>
   <div class="hist-columns" id="histColumns">
     <div class="hist-col">
       <div class="hist-col-header" id="histNameLeft">—</div>
@@ -438,13 +490,16 @@ const drivers = [
    {pos:11,name:"Arvid Lindblad",team:"Racing Bulls",pts:22,color:"#6692FF",
     wins:0,poles:0,podiums:0,p2:0,p3:0,sprintWins:0,crash:0,mechanic:1,fastestLaps:0,q3:6,
     bestQuali:8},
+   {pos:23,name:"Yuki Tsunoda",team:"Racing Bulls",pts:0,color:"#6692FF",
+    wins:0,poles:0,podiums:0,p2:0,p3:0,sprintWins:0,crash:0,mechanic:0,fastestLaps:0,q3:0,
+    bestQuali:99},
   {pos:12,name:"Franco Colapinto",team:"Alpine",pts:19,color:"#0093CC",
    wins:0,poles:0,podiums:0,p2:0,p3:0,sprintWins:0,crash:0,mechanic:0,fastestLaps:0,q3:2,
    bestQuali:8},
    {pos:13,name:"Oliver Bearman",team:"Haas",pts:18,color:"#B6BABD",
     wins:0,poles:0,podiums:0,p2:0,p3:0,sprintWins:0,crash:1,mechanic:2,fastestLaps:0,q3:1,
     bestQuali:10},
-   {pos:14,name:"Gabriel Bortoleto",team:"Audi",pts:10,color:"#999999",
+   {pos:14,name:"Gabriel Bortoleto",team:"Audi",pts:10,color:"#FEC817",
     wins:0,poles:0,podiums:0,p2:0,p3:0,sprintWins:0,crash:0,mechanic:1,fastestLaps:0,q3:3,
     bestQuali:9},
   {pos:15,name:"Carlos Sainz",team:"Williams",pts:6,color:"#64C4FF",
@@ -459,7 +514,7 @@ const drivers = [
    {pos:18,name:"Fernando Alonso",team:"Aston Martin",pts:1,color:"#229971",
     wins:0,poles:0,podiums:0,p2:0,p3:0,sprintWins:0,crash:0,mechanic:4,fastestLaps:0,q3:0,
     bestQuali:17},
-   {pos:19,name:"Nico Hülkenberg",team:"Audi",pts:0,color:"#999999",
+   {pos:19,name:"Nico Hülkenberg",team:"Audi",pts:0,color:"#FEC817",
     wins:0,poles:0,podiums:0,p2:0,p3:0,sprintWins:0,crash:0,mechanic:4,fastestLaps:0,q3:1,
     bestQuali:9},
    {pos:20,name:"Valtteri Bottas",team:"Cadillac",pts:0,color:"#FF4136",
@@ -490,7 +545,7 @@ const teams = [
      wins:0,poles:0,podiums:0,sprintWins:0,crash:2,mechanic:2},
     {pos:8,name:"Williams",pts:11,color:"#64C4FF",drivers:"Sainz, Albon",
      wins:0,poles:0,podiums:0,sprintWins:0,crash:1,mechanic:4},
-   {pos:9,name:"Audi",pts:10,color:"#999999",drivers:"Bortoleto, Hülkenberg",
+   {pos:9,name:"Audi",pts:10,color:"#FEC817",drivers:"Bortoleto, Hülkenberg",
     wins:0,poles:0,podiums:0,sprintWins:0,crash:0,mechanic:5},
    {pos:10,name:"Aston Martin",pts:1,color:"#229971",drivers:"Alonso, Stroll",
     wins:0,poles:0,podiums:0,sprintWins:0,crash:0,mechanic:9},
@@ -512,12 +567,19 @@ const DRIVER_MAP = {
   bearman:'Oliver Bearman',bortoleto:'Gabriel Bortoleto',sainz:'Carlos Sainz',
   albon:'Alexander Albon',ocon:'Esteban Ocon',alonso:'Fernando Alonso',
   hulkenberg:'Nico Hülkenberg',bottas:'Valtteri Bottas',perez:'Sergio Pérez',
-  stroll:'Lance Stroll'
+  stroll:'Lance Stroll',tsunoda:'Yuki Tsunoda'
 };
 const TEAM_MAP = {
   mercedes:'Mercedes',ferrari:'Ferrari',mclaren:'McLaren',red_bull:'Red Bull',
   alpine:'Alpine',rb:'Racing Bulls',haas:'Haas',williams:'Williams',
   audi:'Audi',aston_martin:'Aston Martin',cadillac:'Cadillac'
+};
+// Cores oficiais por equipe — usadas para recolorir um piloto quando ele troca de time
+// no meio da temporada (ex.: Lawson passando de Racing Bulls para Red Bull).
+const TEAM_COLORS = {
+  'Mercedes':'#27F4D2','Ferrari':'#E8002D','McLaren':'#FF8000','Red Bull':'#3671C6',
+  'Alpine':'#0093CC','Racing Bulls':'#6692FF','Haas':'#B6BABD','Williams':'#64C4FF',
+  'Audi':'#FEC817','Aston Martin':'#229971','Cadillac':'#FF4136'
 };
 
 function findDriver(name){ return drivers.find(d=>d.name===name); }
@@ -587,7 +649,7 @@ async function fetchInBatches(urls, batchSize=3, spacingMs=900){
    Só é gravado quando resultsComplete && qualiComplete (ver fetchLiveData). Isso garante que
    o cache nunca fica "corrompido" com uma etapa faltando — na pior das hipóteses, o site mostra
    dados de uma sincronização anterior completa, nunca uma mistura aleatória e incompleta. */
-const SNAPSHOT_KEY = 'f1_2026_snapshot_v2'; // v2: corrige status "Lapped" sendo lido como DNF
+const SNAPSHOT_KEY = 'f1_2026_snapshot_v3'; // v3: adiciona Tsunoda e equipe dinâmica por piloto
 
 function loadSnapshotCache(){
   try{
@@ -697,6 +759,213 @@ async function loadWeatherForRace(lat, lon, dateStr){
   }catch(e){ console.error('Falha ao buscar clima:', e.message); return null; }
 }
 
+// ===== Tempos de setor (S1/S2/S3) via OpenF1 =====
+// A API principal (Jolpica/Ergast) NÃO tem tempos de setor — só o tempo total de Q1/Q2/Q3.
+// A OpenF1 (api.openf1.org) é uma API pública separada, gratuita, com dados desde 2023,
+// que registra o tempo de cada setor por volta. Usamos ela só para essa informação extra.
+// Se não conseguirmos casar com certeza a sessão certa (mesmo ano + mesmo país), preferimos
+// não mostrar setor nenhum a arriscar mostrar o dado errado.
+function normStr(s){
+  return (s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
+}
+
+async function fetchOpenF1SectorTimes(year, countryName){
+  try{
+    const sessions = await fetchJSONWithRetry(`https://api.openf1.org/v1/sessions?year=${year}&session_name=Qualifying`, 2, 500);
+    if(!sessions || !sessions.length) return null;
+    const rc = normStr(countryName);
+    const session = sessions.find(s=>{
+      const sc = normStr(s.country_name);
+      return sc && rc && (sc.includes(rc) || rc.includes(sc));
+    });
+    if(!session) return null; // sem correspondência segura — não arrisca mostrar setor de outra corrida
+
+    const [drivers, laps] = await Promise.all([
+      fetchJSONWithRetry(`https://api.openf1.org/v1/drivers?session_key=${session.session_key}`, 2, 500),
+      fetchJSONWithRetry(`https://api.openf1.org/v1/laps?session_key=${session.session_key}`, 2, 500)
+    ]);
+    if(!drivers || !laps || !laps.length) return null;
+
+    const nameByNumber = {};
+    drivers.forEach(d=>{ if(d.full_name) nameByNumber[d.driver_number] = d.full_name; });
+
+    const bestLapByDriver = {};    // volta mais rápida de cada piloto (define o tempo total exibido)
+    const bestSectorByDriver = {}; // melhor S1/S2/S3 do piloto entre TODAS as voltas da sessão
+    laps.forEach(l=>{
+      if(l.is_pit_out_lap) return;
+      const num = l.driver_number;
+      const bs = bestSectorByDriver[num] = bestSectorByDriver[num] || {s1:null,s2:null,s3:null};
+      if(l.duration_sector_1!=null && (bs.s1==null || l.duration_sector_1<bs.s1)) bs.s1 = l.duration_sector_1;
+      if(l.duration_sector_2!=null && (bs.s2==null || l.duration_sector_2<bs.s2)) bs.s2 = l.duration_sector_2;
+      if(l.duration_sector_3!=null && (bs.s3==null || l.duration_sector_3<bs.s3)) bs.s3 = l.duration_sector_3;
+      if(l.lap_duration!=null){
+        const cur = bestLapByDriver[num];
+        if(!cur || l.lap_duration<cur.lap_duration) bestLapByDriver[num] = l;
+      }
+    });
+
+    const byDriverName = {};
+    Object.keys(bestLapByDriver).forEach(num=>{
+      const fullName = nameByNumber[num];
+      if(!fullName) return;
+      const lap = bestLapByDriver[num];
+      if(lap.duration_sector_1==null || lap.duration_sector_2==null || lap.duration_sector_3==null) return;
+      byDriverName[normStr(fullName)] = {
+        s1: lap.duration_sector_1, s2: lap.duration_sector_2, s3: lap.duration_sector_3,
+        personalBest: bestSectorByDriver[num]
+      };
+    });
+    return Object.keys(byDriverName).length ? byDriverName : null;
+  }catch(e){
+    console.warn('Tempos de setor (OpenF1) indisponíveis para esta corrida:', e.message);
+    return null;
+  }
+}
+
+async function loadGridLargadaWidget(race){
+  const section = document.getElementById('gridLargadaSection');
+  if(!section) return;
+  try{
+    const round = race.round;
+    // Busca a classificação (tempos/posição por tempo) e, se já existir, o resultado da corrida
+    // (única fonte que carrega o grid OFICIAL após punições da FIA). Antes da corrida acontecer,
+    // results.json ainda não existe para esta etapa — nesse caso mostramos a posição por tempo
+    // e deixamos claro que o grid oficial pode mudar. Assim que a FIA publica o resultado (ou
+    // após a corrida), a próxima sincronização já traz o grid definitivo automaticamente.
+    const [qualJson, resJson, sectorData] = await Promise.all([
+      fetchJSONWithRetry(`${API_BASE}/${round}/qualifying.json?limit=50`),
+      fetchJSONWithRetry(`${API_BASE}/${round}/results.json?limit=50`),
+      fetchOpenF1SectorTimes(race.date ? race.date.slice(0,4) : new Date().getFullYear(), race.Circuit?.Location?.country)
+    ]);
+    const qualRace = qualJson?.MRData?.RaceTable?.Races?.[0];
+    const resRace = resJson?.MRData?.RaceTable?.Races?.[0];
+    const qualList = qualRace?.QualifyingResults || [];
+    if(!qualList.length){ section.style.display='none'; return; }
+
+    const gridByDriverId = {};
+    if(resRace?.Results){
+      resRace.Results.forEach(r=>{ gridByDriverId[r.Driver.driverId] = parseInt(r.grid); });
+    }
+    const hasOfficialGrid = Object.keys(gridByDriverId).length > 0;
+
+    document.getElementById('glRaceName').textContent = qualRace.raceName || race.raceName;
+    const loc = qualRace.Circuit?.Location || race.Circuit?.Location;
+    document.getElementById('glCircuit').textContent =
+      `${qualRace.Circuit?.circuitName || race.Circuit?.circuitName || ''}${loc?' · '+loc.locality+', '+loc.country:''}`;
+
+    const noteEl = document.getElementById('glNote');
+    if(noteEl) noteEl.textContent = hasOfficialGrid
+      ? 'Grid de largada oficial — já considera eventuais penalidades aplicadas pelos comissários após a classificação.'
+      : 'Classificação por tempo. O grid de largada oficial é definido pela FIA e pode mudar se houver penalidade — esta lista atualiza sozinha assim que isso for publicado.';
+
+    const rows = qualList.map(res=>{
+      const name = DRIVER_MAP[res.Driver.driverId] || `${res.Driver.givenName} ${res.Driver.familyName}`;
+      const teamName = TEAM_MAP[res.Constructor?.constructorId] || res.Constructor?.name || '—';
+      const teamColor = TEAM_COLORS[teamName] || '#666';
+      const qualPos = parseInt(res.position);
+      const bestTime = res.Q3 || res.Q2 || res.Q1 || null;
+      const officialGrid = hasOfficialGrid ? gridByDriverId[res.Driver.driverId] : null;
+      const finalPos = (officialGrid!=null && !isNaN(officialGrid)) ? officialGrid : qualPos;
+      const penalized = officialGrid!=null && !isNaN(officialGrid) && officialGrid!==qualPos;
+      const penaltyText = !penalized ? '' : (officialGrid>qualPos
+        ? `⚠️ Penalidade: P${qualPos} → P${officialGrid}`
+        : `Ajuste: P${qualPos} → P${officialGrid}`);
+      const sector = sectorData ? sectorData[normStr(name)] : null;
+      return {finalPos, qualPos, name, teamName, teamColor, bestTime, penalized, penaltyText, sector};
+    }).sort((a,b)=>a.finalPos-b.finalPos);
+
+    // Classificação de cor por setor, como na transmissão oficial: roxo = melhor tempo de TODOS
+    // os pilotos naquele setor; verde = melhor tempo do PRÓPRIO piloto naquele setor (mesmo que
+    // tenha sido em outra volta); amarelo = pior tempo de todos os pilotos naquele setor (a pedido
+    // do usuário — vale notar que a transmissão oficial da F1 não usa essa terceira cor, ela só
+    // usa roxo/verde/branco; deixei o amarelo aqui como uma marcação extra deste site).
+    const hasSectorData = rows.some(r=>r.sector);
+    if(noteEl){
+      noteEl.textContent += hasSectorData
+        ? ' Setores via OpenF1: roxo = melhor tempo de todos nesse setor · verde = melhor tempo do próprio piloto nesse setor · amarelo = pior tempo de todos (marcação extra deste site, não usada na transmissão oficial).'
+        : ' Tempos de setor ainda não disponíveis para esta sessão.';
+    }
+    if(hasSectorData){
+      ['s1','s2','s3'].forEach(key=>{
+        const vals = rows.filter(r=>r.sector && r.sector[key]!=null).map(r=>r.sector[key]);
+        if(!vals.length) return;
+        const best = Math.min(...vals), worst = Math.max(...vals);
+        rows.forEach(r=>{
+          if(!r.sector || r.sector[key]==null) return;
+          const v = r.sector[key];
+          const pb = r.sector.personalBest ? r.sector.personalBest[key] : null;
+          let cls = '';
+          if(Math.abs(v-best)<0.0005) cls='purple';
+          else if(pb!=null && Math.abs(v-pb)<0.0005) cls='green';
+          else if(worst>best && Math.abs(v-worst)<0.0005) cls='yellow';
+          r['cls_'+key] = cls;
+        });
+      });
+    }
+
+    // Diferença de tempo para o mais rápido da classificação (referência é sempre o tempo em si,
+    // não a posição de largada — então uma punição de grid não muda quem é o "líder" do cronômetro).
+    // Ex.: "1m20.123s" e "1m20.183s" viram "+0.060s" (60 milésimos), como nos telões oficiais da F1.
+    function parseLapTimeToSeconds(t){
+      if(!t) return null;
+      const parts = t.split(':');
+      const val = parts.length===2 ? parseInt(parts[0])*60 + parseFloat(parts[1]) : parseFloat(t);
+      return isNaN(val) ? null : val;
+    }
+    rows.forEach(r=>{ r.timeSec = parseLapTimeToSeconds(r.bestTime); });
+    const leaderRow = rows.filter(r=>r.timeSec!=null).sort((a,b)=>a.qualPos-b.qualPos)[0];
+    const poleTimeSec = leaderRow ? leaderRow.timeSec : null;
+    rows.forEach(r=>{
+      r.timeDisplay = r.bestTime || '—'; // sempre o tempo absoluto do próprio piloto
+      if(r.timeSec==null){ r.gapDisplay = '—'; return; }
+      if(r === leaderRow){ r.gapDisplay = '—'; return; }
+      if(poleTimeSec==null){ r.gapDisplay = '—'; return; }
+      const gap = r.timeSec - poleTimeSec;
+      r.gapDisplay = '+'+gap.toFixed(3)+'s';
+    });
+
+    function fmtSector(v){ return v==null ? '—' : v.toFixed(3); }
+
+    const groupBanner = `<div class="gl-group-banner">⚙️ Ajustes de Posição${hasSectorData?' e Setores':''}</div>`;
+
+    const headerRow = `
+      <div class="gl-row gl-header ${hasSectorData?'has-sectors':''}">
+        <div class="gl-pos">#</div>
+        <div class="gl-driver">Piloto</div>
+        ${hasSectorData ? '<div class="gl-sector">S1</div><div class="gl-sector">S2</div><div class="gl-sector">S3</div>' : ''}
+        <div class="gl-penalty">Ajuste</div>
+        <div class="gl-time">Tempo</div>
+        <div class="gl-gap">Dif.</div>
+      </div>`;
+
+    document.getElementById('glTable').innerHTML = groupBanner + headerRow + rows.map(r=>`
+      <div class="gl-row ${hasSectorData?'has-sectors':''} ${r.penalized?'penalized':''}">
+        <div class="gl-pos">${r.finalPos}</div>
+        <div class="gl-driver">
+          <span class="gl-team-dot" style="background:${r.teamColor}"></span>
+          <div style="min-width:0">
+            <div class="gl-driver-name">${r.name}</div>
+            <div class="gl-team-name">${r.teamName}</div>
+          </div>
+        </div>
+        ${hasSectorData ? `
+        <div class="gl-sector ${r.sector?(r['cls_s1']||''):'dash'}">${r.sector?fmtSector(r.sector.s1):'—'}</div>
+        <div class="gl-sector ${r.sector?(r['cls_s2']||''):'dash'}">${r.sector?fmtSector(r.sector.s2):'—'}</div>
+        <div class="gl-sector ${r.sector?(r['cls_s3']||''):'dash'}">${r.sector?fmtSector(r.sector.s3):'—'}</div>
+        ` : ''}
+        <div class="gl-penalty">${r.penaltyText ? `<span class="gl-penalty-pill">${r.penaltyText}</span>` : `<span class="gl-penalty-dash">—</span>`}</div>
+        <div class="gl-time">${r.timeDisplay}</div>
+        <div class="gl-gap">${r.gapDisplay}</div>
+      </div>
+    `).join('');
+
+    section.style.display = 'block';
+  }catch(e){
+    console.error('Falha ao montar grid de largada:', e.message);
+    section.style.display = 'none';
+  }
+}
+
 async function loadNextRaceWidget(racesRes){
   const section = document.getElementById('proximaCorridaSection');
   if(!section) return;
@@ -736,6 +1005,20 @@ async function loadNextRaceWidget(racesRes){
     `).join('');
 
     startCountdown(raceDateTime);
+
+    // O grid de largada/classificação NÃO segue a "próxima corrida" da contagem regressiva —
+    // assim que a corrida do fim de semana atual começa (ou termina), a contagem regressiva já
+    // avança para a etapa seguinte, que ainda nem tem classificação disputada. Por isso aqui a
+    // etapa usada é sempre a última cuja Classificação já aconteceu de fato, mantendo o grid
+    // visível durante toda a corrida e até a próxima classificação real acontecer.
+    const withQualiDate = races
+      .filter(r=>r.Qualifying)
+      .map(r=>({r, qualDt: new Date(r.Qualifying.date+'T'+r.Qualifying.time)}));
+    const pastQuali = withQualiDate.filter(x=>x.qualDt <= now).sort((a,b)=>b.qualDt-a.qualDt);
+    const gridRace = pastQuali.length ? pastQuali[0].r : null;
+    if(gridRace) loadGridLargadaWidget(gridRace); // busca independente, com seu próprio tratamento de erro
+    else { const gl = document.getElementById('gridLargadaSection'); if(gl) gl.style.display='none'; }
+
 
     const wtEl = document.getElementById('pcWeatherTire');
     if(loc){
@@ -816,6 +1099,37 @@ async function fetchLiveData(){
 
     const drvList = drvRes.MRData.StandingsTable.StandingsLists[0]?.DriverStandings || [];
     const conList = conRes.MRData.StandingsTable.StandingsLists[0]?.ConstructorStandings || [];
+
+    // ===== Equipe ATUAL de cada piloto (para refletir substituições no meio da temporada,
+    // como Lawson assumindo a vaga do Hadjar machucado na Red Bull, e Tsunoda entrando na
+    // Racing Bulls no lugar do Lawson) — usa a equipe da corrida de round mais alto em que o
+    // piloto apareceu, em vez de um valor fixo definido no início da temporada.
+    const currentTeamByDriver = {};
+    const lastRoundSeenByDriver = {};
+    raceResults.forEach(race=>{
+      if(!race.Results) return;
+      const rnd = parseInt(race.round);
+      race.Results.forEach(res=>{
+        const name = DRIVER_MAP[res.Driver.driverId];
+        const teamName = TEAM_MAP[res.Constructor?.constructorId];
+        if(!name || !teamName) return;
+        if(!(name in lastRoundSeenByDriver) || rnd>=lastRoundSeenByDriver[name]){
+          lastRoundSeenByDriver[name] = rnd;
+          currentTeamByDriver[name] = teamName;
+        }
+      });
+    });
+    const driversByTeam = {};
+    const latestRoundWithResults = raceResults.reduce((max,race)=>race.Results&&race.Results.length?Math.max(max,parseInt(race.round)):max, 0);
+    const latestRace = raceResults.find(race=>parseInt(race.round)===latestRoundWithResults);
+    if(latestRace && latestRace.Results){
+      latestRace.Results.forEach(res=>{
+        const name = DRIVER_MAP[res.Driver.driverId];
+        const teamName = TEAM_MAP[res.Constructor?.constructorId];
+        if(!name || !teamName) return;
+        (driversByTeam[teamName] = driversByTeam[teamName]||[]).push(name);
+      });
+    }
 
     const stats = {};
     Object.values(DRIVER_MAP).forEach(n=>{ stats[n]={wins:0,poles:0,podiums:0,p2:0,p3:0,sprintWins:0,fastestLaps:0,q3:0,bestQuali:99,crash:0,mechanic:0}; });
@@ -900,6 +1214,14 @@ async function fetchLiveData(){
       if(!drv) return;
       drv.pts = parseInt(d.points);
       drv.pos = parseInt(d.position);
+      // Atualiza a equipe do piloto conforme a corrida mais recente (cobre substituições/trocas
+      // de time no meio da temporada), e a cor junto, para não mostrar um piloto com a cor da
+      // equipe antiga.
+      const detectedTeam = currentTeamByDriver[name];
+      if(detectedTeam){
+        drv.team = detectedTeam;
+        drv.color = TEAM_COLORS[detectedTeam] || drv.color;
+      }
       drv.wins = parseInt(d.wins) || stats[name].wins;
       if(resultsComplete){
         drv.podiums = stats[name].podiums;
@@ -932,6 +1254,15 @@ async function fetchLiveData(){
           team.mechanic = teamStats[name].mechanic;
         }
         team.sprintWins = teamStats[name].sprintWins;
+      }
+      // Atualiza a dupla de pilotos exibida pela equipe conforme quem correu mais recentemente
+      // por ela — cobre substituições no meio da temporada (ex.: "Lindblad, Tsunoda").
+      if(driversByTeam[name] && driversByTeam[name].length){
+        const lineup = driversByTeam[name]
+          .slice()
+          .sort((a,b)=>(findDriver(a)?.pos ?? 99)-(findDriver(b)?.pos ?? 99))
+          .map(n=>n.trim().split(' ').pop());
+        team.drivers = lineup.join(', ');
       }
     });
 
@@ -1375,7 +1706,12 @@ function renderHistorico(driverName, containerId){
     container.innerHTML = '<div class="hist-loading">Nenhuma corrida registrada ainda para este piloto em 2026.</div>';
     return;
   }
-  container.innerHTML = races.map(r=>{
+  // Mostra apenas a corrida mais recente (races[0], já que o array vem ordenado da mais nova
+  // para a mais antiga). O histórico completo de todas as etapas foi removido por decisão do
+  // usuário: a sincronização de todas as corridas de uma vez era instável; limitar à última
+  // etapa evita mostrar dados desatualizados ou incompletos.
+  const lastRace = [races[0]];
+  container.innerHTML = lastRace.map(r=>{
     const dnfReason = statusReasonPT(r.status);
     const isWin = r.finish===1;
     const isPodium = r.finish<=3 && !dnfReason;
