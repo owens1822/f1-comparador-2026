@@ -4,7 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>F1 2026 · Comparador de Pilotos e Equipes</title>
-<link href="https://fonts.googleapis.com/css2?family=Titillium+Web:wght@300;400;600;700;900&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://api.jolpi.ca" crossorigin>
+<link rel="preconnect" href="https://api.openf1.org" crossorigin>
+<link rel="preconnect" href="https://api.open-meteo.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Titillium+Web:wght@400;600;700;900&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 :root{
@@ -30,6 +35,7 @@ header{
   background:var(--f1-red);padding:4px 12px;border-radius:6px;letter-spacing:1px;
 }
 .header-updated{font-size:10px;color:#555;margin-top:4px;}
+.header-updated:hover{color:#999;text-decoration:underline;}
 .season-badge{
   display:inline-flex;align-items:center;gap:6px;font-family:'Orbitron',monospace;
   font-size:12px;font-weight:700;color:var(--f1-gold);background:rgba(255,215,0,.1);
@@ -361,7 +367,7 @@ tbody tr:nth-child(3) td{color:#cd7f32;font-weight:700;}
   <div style="text-align:right">
     <div class="header-ano">TEMPORADA 2026</div>
     <div id="apiInfo" style="font-size:10px;color:#555;margin-top:6px">Carregando dados...</div>
-    <div id="lastUpdated" class="header-updated"></div>
+    <div id="lastUpdated" class="header-updated" style="cursor:pointer" title="Clique para atualizar agora" onclick="syncLiveData(true)"></div>
   </div>
 </header>
 
@@ -457,106 +463,119 @@ tbody tr:nth-child(3) td{color:#cd7f32;font-weight:700;}
 
 <script>
 const drivers = [
-   {pos:1,name:"Kimi Antonelli",team:"Mercedes",pts:219,color:"#27F4D2",
-    wins:6,poles:6,podiums:9,p2:1,p3:2,sprintWins:1,crash:0,mechanic:1,fastestLaps:6,q3:11,
-    bestQuali:1},
-   {pos:2,name:"Lewis Hamilton",team:"Ferrari",pts:169,color:"#E8002D",
-    wins:1,poles:0,podiums:5,p2:3,p3:1,sprintWins:0,crash:0,mechanic:0,fastestLaps:1,q3:10,
-    bestQuali:2},
-   {pos:3,name:"George Russell",team:"Mercedes",pts:160,color:"#27F4D2",
-    wins:2,poles:4,podiums:5,p2:1,p3:1,sprintWins:1,crash:2,mechanic:1,fastestLaps:2,q3:10,
-    bestQuali:1},
-   {pos:4,name:"Charles Leclerc",team:"Ferrari",pts:138,color:"#E8002D",
-    wins:1,poles:0,podiums:4,p2:2,p3:1,sprintWins:0,crash:2,mechanic:1,fastestLaps:1,q3:10,
-    bestQuali:2},
-   {pos:5,name:"Lando Norris",team:"McLaren",pts:128,color:"#FF8000",
-    wins:1,poles:1,podiums:2,p2:1,p3:1,sprintWins:1,crash:0,mechanic:3,fastestLaps:1,q3:10,
-    bestQuali:1},
-   {pos:6,name:"Oscar Piastri",team:"McLaren",pts:92,color:"#FF8000",
-    wins:0,poles:0,podiums:2,p2:1,p3:1,sprintWins:0,crash:2,mechanic:1,fastestLaps:1,q3:10,
-    bestQuali:3},
-   {pos:7,name:"Max Verstappen",team:"Red Bull",pts:91,color:"#3671C6",
-    wins:0,poles:0,podiums:3,p2:2,p3:1,sprintWins:0,crash:1,mechanic:2,fastestLaps:1,q3:8,
-    bestQuali:2},
-   {pos:8,name:"Isack Hadjar",team:"Red Bull",pts:60,color:"#3671C6",
-    wins:0,poles:0,podiums:0,p2:0,p3:0,sprintWins:0,crash:1,mechanic:1,fastestLaps:0,q3:10,
-    bestQuali:3},
-   {pos:9,name:"Pierre Gasly",team:"Alpine",pts:42,color:"#0093CC",
-    wins:0,poles:0,podiums:1,p2:0,p3:1,sprintWins:0,crash:1,mechanic:0,fastestLaps:0,q3:4,
-    bestQuali:7},
-   {pos:10,name:"Liam Lawson",team:"Racing Bulls",pts:39,color:"#6692FF",
-    wins:0,poles:0,podiums:0,p2:0,p3:0,sprintWins:0,crash:1,mechanic:0,fastestLaps:0,q3:5,
-    bestQuali:8},
-   {pos:11,name:"Arvid Lindblad",team:"Racing Bulls",pts:22,color:"#6692FF",
-    wins:0,poles:0,podiums:0,p2:0,p3:0,sprintWins:0,crash:0,mechanic:1,fastestLaps:0,q3:6,
-    bestQuali:8},
-   {pos:23,name:"Yuki Tsunoda",team:"Racing Bulls",pts:0,color:"#6692FF",
-    wins:0,poles:0,podiums:0,p2:0,p3:0,sprintWins:0,crash:0,mechanic:0,fastestLaps:0,q3:0,
-    bestQuali:99},
-  {pos:12,name:"Franco Colapinto",team:"Alpine",pts:19,color:"#0093CC",
-   wins:0,poles:0,podiums:0,p2:0,p3:0,sprintWins:0,crash:0,mechanic:0,fastestLaps:0,q3:2,
+  {pos:1,name:"Kimi Antonelli",team:"Mercedes",pts:365,color:"#27F4D2",
+   wins:9,poles:7,podiums:15,p2:3,p3:3,sprintWins:1,crash:0,mechanic:1,fastestLaps:7,q3:17,
+   bestQuali:1},
+  {pos:2,name:"George Russell",team:"Mercedes",pts:242,color:"#27F4D2",
+   wins:3,poles:5,podiums:8,p2:4,p3:1,sprintWins:3,crash:0,mechanic:3,fastestLaps:2,q3:18,
+   bestQuali:1},
+  {pos:3,name:"Lewis Hamilton",team:"Ferrari",pts:241,color:"#E8002D",
+   wins:1,poles:0,podiums:6,p2:2,p3:3,sprintWins:0,crash:0,mechanic:1,fastestLaps:1,q3:18,
+   bestQuali:2},
+  {pos:4,name:"Max Verstappen",team:"Red Bull",pts:236,color:"#3671C6",
+   wins:2,poles:2,podiums:10,p2:4,p3:4,sprintWins:1,crash:0,mechanic:4,fastestLaps:2,q3:16,
+   bestQuali:1},
+  {pos:5,name:"Charles Leclerc",team:"Ferrari",pts:233,color:"#E8002D",
+   wins:1,poles:0,podiums:6,p2:3,p3:2,sprintWins:0,crash:0,mechanic:3,fastestLaps:4,q3:17,
+   bestQuali:2},
+  {pos:6,name:"Lando Norris",team:"McLaren",pts:211,color:"#FF8000",
+   wins:2,poles:3,podiums:5,p2:1,p3:2,sprintWins:1,crash:0,mechanic:3,fastestLaps:2,q3:18,
+   bestQuali:1},
+  {pos:7,name:"Oscar Piastri",team:"McLaren",pts:144,color:"#FF8000",
+   wins:0,poles:0,podiums:2,p2:1,p3:1,sprintWins:0,crash:0,mechanic:1,fastestLaps:0,q3:18,
+   bestQuali:3},
+  {pos:8,name:"Isack Hadjar",team:"Red Bull",pts:105,color:"#3671C6",
+   wins:0,poles:0,podiums:2,p2:0,p3:2,sprintWins:0,crash:0,mechanic:2,fastestLaps:0,q3:12,
+   bestQuali:3},
+  {pos:9,name:"Liam Lawson",team:"Racing Bulls",pts:77,color:"#6692FF",
+   wins:0,poles:0,podiums:0,p2:0,p3:0,sprintWins:0,crash:0,mechanic:1,fastestLaps:0,q3:8,
    bestQuali:8},
-   {pos:13,name:"Oliver Bearman",team:"Haas",pts:18,color:"#B6BABD",
-    wins:0,poles:0,podiums:0,p2:0,p3:0,sprintWins:0,crash:1,mechanic:2,fastestLaps:0,q3:1,
-    bestQuali:10},
-   {pos:14,name:"Gabriel Bortoleto",team:"Audi",pts:10,color:"#FEC817",
-    wins:0,poles:0,podiums:0,p2:0,p3:0,sprintWins:0,crash:0,mechanic:1,fastestLaps:0,q3:3,
-    bestQuali:9},
-  {pos:15,name:"Carlos Sainz",team:"Williams",pts:6,color:"#64C4FF",
-   wins:0,poles:0,podiums:0,p2:0,p3:0,sprintWins:0,crash:1,mechanic:0,fastestLaps:0,q3:0,
+  {pos:10,name:"Pierre Gasly",team:"Alpine",pts:42,color:"#0093CC",
+   wins:0,poles:1,podiums:0,p2:0,p3:0,sprintWins:0,crash:0,mechanic:2,fastestLaps:0,q3:8,
+   bestQuali:1},
+  {pos:11,name:"Arvid Lindblad",team:"Racing Bulls",pts:38,color:"#6692FF",
+   wins:0,poles:0,podiums:0,p2:0,p3:0,sprintWins:0,crash:0,mechanic:0,fastestLaps:0,q3:12,
+   bestQuali:8},
+  {pos:12,name:"Franco Colapinto",team:"Alpine",pts:27,color:"#0093CC",
+   wins:0,poles:0,podiums:0,p2:0,p3:0,sprintWins:0,crash:0,mechanic:3,fastestLaps:0,q3:5,
+   bestQuali:8},
+  {pos:13,name:"Oliver Bearman",team:"Haas",pts:23,color:"#B6BABD",
+   wins:0,poles:0,podiums:0,p2:0,p3:0,sprintWins:0,crash:0,mechanic:5,fastestLaps:0,q3:1,
+   bestQuali:10},
+  {pos:14,name:"Nico Hülkenberg",team:"Audi",pts:13,color:"#FEC817",
+   wins:0,poles:0,podiums:0,p2:0,p3:0,sprintWins:0,crash:0,mechanic:3,fastestLaps:0,q3:2,
+   bestQuali:9},
+  {pos:15,name:"Gabriel Bortoleto",team:"Audi",pts:10,color:"#FEC817",
+   wins:0,poles:0,podiums:0,p2:0,p3:0,sprintWins:0,crash:0,mechanic:1,fastestLaps:0,q3:4,
+   bestQuali:9},
+  {pos:16,name:"Esteban Ocon",team:"Haas",pts:7,color:"#B6BABD",
+   wins:0,poles:0,podiums:0,p2:0,p3:0,sprintWins:0,crash:0,mechanic:1,fastestLaps:0,q3:0,
    bestQuali:12},
-   {pos:16,name:"Alexander Albon",team:"Williams",pts:5,color:"#64C4FF",
-    wins:0,poles:0,podiums:0,p2:0,p3:0,sprintWins:0,crash:0,mechanic:4,fastestLaps:0,q3:0,
-    bestQuali:11},
-  {pos:17,name:"Esteban Ocon",team:"Haas",pts:3,color:"#B6BABD",
-   wins:0,poles:0,podiums:0,p2:0,p3:0,sprintWins:0,crash:1,mechanic:0,fastestLaps:0,q3:0,
+  {pos:17,name:"Fernando Alonso",team:"Aston Martin",pts:7,color:"#229971",
+   wins:0,poles:0,podiums:0,p2:0,p3:0,sprintWins:0,crash:0,mechanic:6,fastestLaps:0,q3:0,
    bestQuali:12},
-   {pos:18,name:"Fernando Alonso",team:"Aston Martin",pts:1,color:"#229971",
-    wins:0,poles:0,podiums:0,p2:0,p3:0,sprintWins:0,crash:0,mechanic:4,fastestLaps:0,q3:0,
-    bestQuali:17},
-   {pos:19,name:"Nico Hülkenberg",team:"Audi",pts:0,color:"#FEC817",
-    wins:0,poles:0,podiums:0,p2:0,p3:0,sprintWins:0,crash:0,mechanic:4,fastestLaps:0,q3:1,
-    bestQuali:9},
-   {pos:20,name:"Valtteri Bottas",team:"Cadillac",pts:0,color:"#FF4136",
-    wins:0,poles:0,podiums:0,p2:0,p3:0,sprintWins:0,crash:0,mechanic:4,fastestLaps:0,q3:0,
-    bestQuali:18},
-   {pos:21,name:"Sergio Pérez",team:"Cadillac",pts:0,color:"#FF4136",
-    wins:0,poles:0,podiums:0,p2:0,p3:0,sprintWins:0,crash:0,mechanic:3,fastestLaps:0,q3:0,
-    bestQuali:18},
-   {pos:22,name:"Lance Stroll",team:"Aston Martin",pts:0,color:"#229971",
-    wins:0,poles:0,podiums:0,p2:0,p3:0,sprintWins:0,crash:0,mechanic:5,fastestLaps:0,q3:0,
-    bestQuali:19},
+  {pos:18,name:"Carlos Sainz",team:"Williams",pts:7,color:"#64C4FF",
+   wins:0,poles:0,podiums:0,p2:0,p3:0,sprintWins:0,crash:0,mechanic:3,fastestLaps:0,q3:1,
+   bestQuali:9},
+  {pos:19,name:"Alexander Albon",team:"Williams",pts:5,color:"#64C4FF",
+   wins:0,poles:0,podiums:0,p2:0,p3:0,sprintWins:0,crash:0,mechanic:6,fastestLaps:0,q3:0,
+   bestQuali:11},
+  {pos:20,name:"Yuki Tsunoda",team:"Racing Bulls",pts:1,color:"#6692FF",
+   wins:0,poles:0,podiums:0,p2:0,p3:0,sprintWins:0,crash:0,mechanic:0,fastestLaps:0,q3:0,
+   bestQuali:12},
+  {pos:21,name:"Lance Stroll",team:"Aston Martin",pts:0,color:"#229971",
+   wins:0,poles:0,podiums:0,p2:0,p3:0,sprintWins:0,crash:0,mechanic:11,fastestLaps:0,q3:0,
+   bestQuali:14},
+  {pos:22,name:"Valtteri Bottas",team:"Cadillac",pts:0,color:"#FF4136",
+   wins:0,poles:0,podiums:0,p2:0,p3:0,sprintWins:0,crash:0,mechanic:9,fastestLaps:0,q3:0,
+   bestQuali:18},
+  {pos:23,name:"Sergio Pérez",team:"Cadillac",pts:0,color:"#FF4136",
+   wins:0,poles:0,podiums:0,p2:0,p3:0,sprintWins:0,crash:0,mechanic:5,fastestLaps:0,q3:0,
+   bestQuali:18}
 ];
 
 const teams = [
-  {pos:1,name:"Mercedes",pts:358,color:"#27F4D2",drivers:"Antonelli, Russell",
-   wins:8,poles:10,podiums:13,sprintWins:2,crash:2,mechanic:3},
-  {pos:2,name:"Ferrari",pts:285,color:"#E8002D",drivers:"Hamilton, Leclerc",
-   wins:2,poles:0,podiums:9,sprintWins:0,crash:2,mechanic:1},
-  {pos:3,name:"McLaren",pts:195,color:"#FF8000",drivers:"Norris, Piastri",
-   wins:0,poles:0,podiums:4,sprintWins:1,crash:2,mechanic:4},
-   {pos:4,name:"Red Bull",pts:151,color:"#3671C6",drivers:"Verstappen, Hadjar",
-    wins:0,poles:0,podiums:3,sprintWins:0,crash:2,mechanic:3},
-   {pos:5,name:"Alpine",pts:61,color:"#0093CC",drivers:"Gasly, Colapinto",
-    wins:0,poles:0,podiums:1,sprintWins:0,crash:1,mechanic:0},
-  {pos:6,name:"Racing Bulls",pts:61,color:"#6692FF",drivers:"Lawson, Lindblad",
-   wins:0,poles:0,podiums:0,sprintWins:0,crash:1,mechanic:1},
-    {pos:7,name:"Haas",pts:21,color:"#B6BABD",drivers:"Bearman, Ocon",
-     wins:0,poles:0,podiums:0,sprintWins:0,crash:2,mechanic:2},
-    {pos:8,name:"Williams",pts:11,color:"#64C4FF",drivers:"Sainz, Albon",
-     wins:0,poles:0,podiums:0,sprintWins:0,crash:1,mechanic:4},
-   {pos:9,name:"Audi",pts:10,color:"#FEC817",drivers:"Bortoleto, Hülkenberg",
-    wins:0,poles:0,podiums:0,sprintWins:0,crash:0,mechanic:5},
-   {pos:10,name:"Aston Martin",pts:1,color:"#229971",drivers:"Alonso, Stroll",
-    wins:0,poles:0,podiums:0,sprintWins:0,crash:0,mechanic:9},
-   {pos:11,name:"Cadillac",pts:0,color:"#FF4136",drivers:"Bottas, Pérez",
-    wins:0,poles:0,podiums:0,sprintWins:0,crash:0,mechanic:7},
+  {pos:1,name:"Mercedes",pts:607,color:"#27F4D2",drivers:"Antonelli, Russell",
+   wins:12,poles:12,podiums:23,sprintWins:4,crash:0,mechanic:4},
+  {pos:2,name:"Ferrari",pts:474,color:"#E8002D",drivers:"Hamilton, Leclerc",
+   wins:2,poles:0,podiums:12,sprintWins:0,crash:0,mechanic:4},
+  {pos:3,name:"Red Bull",pts:355,color:"#3671C6",drivers:"Verstappen, Hadjar",
+   wins:2,poles:2,podiums:12,sprintWins:1,crash:0,mechanic:6},
+  {pos:4,name:"McLaren",pts:355,color:"#FF8000",drivers:"Norris, Piastri",
+   wins:2,poles:3,podiums:7,sprintWins:1,crash:0,mechanic:4},
+  {pos:5,name:"Racing Bulls",pts:102,color:"#6692FF",drivers:"Lawson, Lindblad",
+   wins:0,poles:0,podiums:0,sprintWins:0,crash:0,mechanic:1},
+  {pos:6,name:"Alpine",pts:69,color:"#0093CC",drivers:"Gasly, Colapinto",
+   wins:0,poles:1,podiums:0,sprintWins:0,crash:0,mechanic:5},
+  {pos:7,name:"Haas",pts:30,color:"#B6BABD",drivers:"Bearman, Ocon",
+   wins:0,poles:0,podiums:0,sprintWins:0,crash:0,mechanic:6},
+  {pos:8,name:"Audi",pts:23,color:"#FEC817",drivers:"Hülkenberg, Bortoleto",
+   wins:0,poles:0,podiums:0,sprintWins:0,crash:0,mechanic:4},
+  {pos:9,name:"Williams",pts:12,color:"#64C4FF",drivers:"Sainz, Albon",
+   wins:0,poles:0,podiums:0,sprintWins:0,crash:0,mechanic:9},
+  {pos:10,name:"Aston Martin",pts:7,color:"#229971",drivers:"Alonso, Stroll",
+   wins:0,poles:0,podiums:0,sprintWins:0,crash:0,mechanic:17},
+  {pos:11,name:"Cadillac",pts:0,color:"#FF4136",drivers:"Bottas, Pérez",
+   wins:0,poles:0,podiums:0,sprintWins:0,crash:0,mechanic:14}
 ];
 
+/* =========================================================================
+   Estado da página
+   ========================================================================= */
 let tipoAtual = 'piloto';
+let abaAtual = 'pilotos';
 let raceHistoryData = {};
 let raceMetaByRound = {};
-let currentRound = 11;
+let currentRound = 18;
+let totalRaces = null;
+
+// Cache bruto por etapa: { "1": {results, qualifying, sprint, updatedAt}, ... }
+// Guardar o dado bruto (e não só o resultado final) permite atualizar apenas a
+// etapa mais recente nas próximas visitas, sem baixar a temporada inteira.
+let roundsData = {};
+let scheduleRaces = [];
+let syncedAt = 0;
+let syncInFlight = null;
 
 const API_BASE = 'https://api.jolpi.ca/ergast/f1/2026';
 const DRIVER_MAP = {
@@ -582,8 +601,30 @@ const TEAM_COLORS = {
   'Audi':'#FEC817','Aston Martin':'#229971','Cadillac':'#FF4136'
 };
 
+const CACHE_KEY = 'f1_2026_cache_v4';
+const LEGACY_SNAPSHOT_KEY = 'f1_2026_snapshot_v3';
+const SELECTION_KEY = 'f1_selection_v1';
+const WEATHER_KEY = 'f1_weather_v1';
+const SECTOR_KEY = 'f1_sectors_v1';
+
+const SYNC_TTL_MS = 2 * 60 * 1000;       // não sincroniza de novo antes disso
+const WEATHER_TTL_MS = 30 * 60 * 1000;   // previsão do tempo
+const SECTOR_TTL_MS = 24 * 60 * 60 * 1000; // setores da classificação
+const REQUEST_GAP_MS = 280;              // ~3,5 req/s — abaixo do limite de 4 req/s
+
+const sleep = ms => new Promise(r=>setTimeout(r, ms));
+
+let selectionByType = readStoredSelection();
+
+function readStoredSelection(){
+  try{ return JSON.parse(localStorage.getItem(SELECTION_KEY)) || {}; }
+  catch(e){ return {}; }
+}
+
 function findDriver(name){ return drivers.find(d=>d.name===name); }
 function findTeam(name){ return teams.find(t=>t.name===name); }
+
+function roundKey(round){ return String(round); }
 
 /* Um piloto que termina voltas atrás do líder ainda é classificado como "terminou a prova" —
    não é um abandono (DNF). A API às vezes representa isso como "+1 Lap"/"+2 Laps", mas em
@@ -602,84 +643,224 @@ function isClassifiedFinishStatus(status){
   return false;
 }
 
-/* ===== Camada de acesso à API com retry + respeito ao rate limit (evita dados "aleatórios") =====
-   A Jolpica/Ergast permite no máximo 4 req/s (burst) e 500 req/h (sustained). O código antigo
-   disparava até 36 requisições simultâneas (Promise.all de 11 etapas x 3 endpoints), o que
-   estourava o burst limit e fazia a API responder 429 para parte delas. Essas falhas eram
-   engolidas por um .catch(()=>null) e a corrida correspondente simplesmente sumia do histórico
-   — por isso etapas diferentes "faltavam" a cada recarregamento, de forma imprevisível. */
+/* =========================================================================
+   Acesso à API: fila única, retry e paginação
+   =========================================================================
+   A Jolpica/Ergast permite ~4 req/s (burst) e 500 req/h (sustained). A versão
+   antiga disparava até 77 requisições por acesso ao site (18 etapas x 3 +
+   retries), estourava o burst, recebia 429 e levava ~20-30 s para atualizar.
+   Agora todas as chamadas passam por uma fila com intervalo mínimo e a
+   temporada inteira é baixada em poucas páginas agregadas. */
 
-async function fetchJSONWithRetry(url, retries=4, baseDelayMs=600){
-  for(let attempt=0; attempt<=retries; attempt++){
+let _requestQueue = Promise.resolve();
+let _lastRequestAt = 0;
+
+function queuedFetch(url, options){
+  const run = async () => {
+    const wait = REQUEST_GAP_MS - (Date.now() - _lastRequestAt);
+    if(wait > 0) await sleep(wait);
+    _lastRequestAt = Date.now();
+    return fetch(url, options);
+  };
+  const p = _requestQueue.then(run, run);
+  _requestQueue = p.then(()=>{}, ()=>{});
+  return p;
+}
+
+async function fetchJSONWithRetry(url, retries=3, baseDelayMs=800){
+  let attempt = 0;
+  while(attempt <= retries){
     try{
-      const res = await fetch(url);
-      if(res.status===429){
+      const res = await queuedFetch(url);
+      if(res.status === 429){
         const retryAfterHeader = res.headers.get('Retry-After');
         const wait = retryAfterHeader ? parseFloat(retryAfterHeader)*1000 : baseDelayMs*Math.pow(2,attempt);
-        await new Promise(r=>setTimeout(r, wait));
-        continue; // tenta de novo sem gastar uma tentativa "de erro"
+        await sleep(Math.min(Math.max(wait, 1000), 10000));
+        attempt++;
+        continue;
       }
       if(!res.ok) throw new Error('HTTP '+res.status);
       return await res.json();
     }catch(e){
-      if(attempt===retries){
+      if(attempt >= retries){
         console.warn('Falha definitiva ao buscar', url, e.message);
         return null;
       }
-      await new Promise(r=>setTimeout(r, baseDelayMs*Math.pow(2,attempt)));
+      await sleep(baseDelayMs*Math.pow(2, attempt));
+      attempt++;
     }
   }
   return null;
 }
 
-// Busca uma lista de URLs em pequenos lotes espaçados no tempo, para nunca passar de ~3 req/s
-// (fica com margem de segurança abaixo do burst limit de 4 req/s da API).
-async function fetchInBatches(urls, batchSize=3, spacingMs=900){
-  const results = new Array(urls.length);
-  for(let i=0; i<urls.length; i+=batchSize){
-    const batch = urls.slice(i, i+batchSize);
-    const batchResults = await Promise.all(batch.map(u=>fetchJSONWithRetry(u)));
-    batchResults.forEach((r,j)=>{ results[i+j] = r; });
-    if(i+batchSize<urls.length) await new Promise(r=>setTimeout(r, spacingMs));
+// Junta um payload de corrida (results/qualifying/sprint) no cache por etapa.
+// A mesma etapa pode chegar cortada entre duas páginas da API; por isso o merge
+// é feito por piloto, e não substituindo o array inteiro.
+function driverResultKey(r){
+  return r?.Driver?.driverId || String(r?.Driver?.code || r?.number || '');
+}
+
+function mergeRacePayload(type, race){
+  if(!race || !race.round) return;
+  const key = roundKey(race.round);
+  const entry = roundsData[key] || (roundsData[key] = {});
+  const listKey = type==='results' ? 'Results'
+                : type==='qualifying' ? 'QualifyingResults'
+                : 'SprintResults';
+  const incoming = race[listKey] || [];
+  const current = entry[type] || {};
+  const merged = Object.assign({}, current, race);
+  const byDriver = new Map((current[listKey] || []).map(r=>[driverResultKey(r), r]));
+  incoming.forEach(r=>byDriver.set(driverResultKey(r), r));
+  merged[listKey] = Array.from(byDriver.values())
+    .sort((a,b)=>(parseInt(a.position)||999)-(parseInt(b.position)||999));
+  entry[type] = merged;
+  entry.updatedAt = Date.now();
+}
+
+// Baixa todas as páginas de um endpoint agregado (results/qualifying/sprint).
+// A API limita cada página a 100 itens; 18 etapas x 22 pilotos = 4 páginas.
+async function fetchPagedRaces(path, type, limit=100){
+  let first;
+  try{
+    first = await fetchJSONWithRetry(`${API_BASE}/${path}.json?limit=${limit}&offset=0`);
+  }catch(e){ first = null; }
+  if(!first) return false;
+
+  const md = first.MRData || {};
+  const total = parseInt(md.total) || 0;
+  const pages = Math.min(20, Math.max(1, Math.ceil(total/limit)));
+  (md.RaceTable?.Races || []).forEach(r=>mergeRacePayload(type, r));
+
+  if(pages > 1){
+    const requests = [];
+    for(let i=1; i<pages; i++){
+      requests.push(fetchJSONWithRetry(`${API_BASE}/${path}.json?limit=${limit}&offset=${i*limit}`));
+    }
+    const rest = await Promise.all(requests);
+    rest.forEach(j=>{
+      (j?.MRData?.RaceTable?.Races || []).forEach(r=>mergeRacePayload(type, r));
+    });
   }
-  return results;
+  return true;
 }
 
-/* ===== Snapshot local (localStorage): guarda o último conjunto de dados 100% completo =====
-   Só é gravado quando resultsComplete && qualiComplete (ver fetchLiveData). Isso garante que
-   o cache nunca fica "corrompido" com uma etapa faltando — na pior das hipóteses, o site mostra
-   dados de uma sincronização anterior completa, nunca uma mistura aleatória e incompleta. */
-const SNAPSHOT_KEY = 'f1_2026_snapshot_v3'; // v3: adiciona Tsunoda e equipe dinâmica por piloto
+function roundHasSprint(round){
+  if(!scheduleRaces.length) return true; // sem calendário: busca por segurança
+  const race = scheduleRaces.find(r=>String(r.round)===String(round));
+  return !!race?.Sprint;
+}
 
-function loadSnapshotCache(){
+function roundComplete(round){
+  const d = roundsData[roundKey(round)];
+  return !!(d?.results?.Results?.length && d?.qualifying?.QualifyingResults?.length);
+}
+
+function missingRounds(){
+  const out = [];
+  for(let r=1; r<=currentRound; r++){
+    if(!roundComplete(r)) out.push(r);
+  }
+  return out;
+}
+
+async function fetchRoundData(round, includeSprint=true){
+  const jobs = [
+    fetchJSONWithRetry(`${API_BASE}/${round}/results.json?limit=50`),
+    fetchJSONWithRetry(`${API_BASE}/${round}/qualifying.json?limit=50`)
+  ];
+  if(includeSprint){
+    jobs.push(fetchJSONWithRetry(`${API_BASE}/${round}/sprint.json?limit=50`));
+  }
+  const [res, qual, sprint] = await Promise.all(jobs);
+  if(res) mergeRacePayload('results', res?.MRData?.RaceTable?.Races?.[0]);
+  if(qual) mergeRacePayload('qualifying', qual?.MRData?.RaceTable?.Races?.[0]);
+  if(includeSprint) mergeRacePayload('sprint', sprint?.MRData?.RaceTable?.Races?.[0]);
+  const entry = roundsData[roundKey(round)];
+  if(entry) entry.fetchedAt = Date.now();
+}
+
+/* =========================================================================
+   Cache local (localStorage)
+   =========================================================================
+   Diferente do snapshot antigo (que só era gravado quando a temporada inteira
+   vinha completa), aqui gravamos o dado bruto de cada etapa assim que ele chega.
+   Assim uma falha de rede em uma etapa não joga fora as outras 17, e a próxima
+   visita baixa só o que falta. */
+
+function loadCachedData(){
   try{
-    const raw = localStorage.getItem(SNAPSHOT_KEY);
-    if(!raw) return null;
-    const parsed = JSON.parse(raw);
-    if(!parsed || !Array.isArray(parsed.drivers) || !Array.isArray(parsed.teams)) return null;
-    return parsed;
-  }catch(e){ return null; }
-}
+    const raw = localStorage.getItem(CACHE_KEY);
+    if(raw){
+      const c = JSON.parse(raw);
+      if(c && c.v === 4){
+        roundsData = c.roundsData || {};
+        scheduleRaces = c.scheduleRaces || [];
+        currentRound = parseInt(c.currentRound) || currentRound;
+        totalRaces = c.totalRaces || null;
+        syncedAt = c.syncedAt || 0;
+        applyCachedStandings(c);
+        return true;
+      }
+    }
+  }catch(e){ /* cache corrompido: segue sem ele */ }
 
-function saveSnapshotCache(){
+  // Migração do snapshot antigo (v3) — evita uma primeira visita lenta só
+  // porque a chave do cache mudou.
   try{
-    localStorage.setItem(SNAPSHOT_KEY, JSON.stringify({
-      drivers, teams, raceHistoryData, raceMetaByRound, currentRound,
-      savedAt: Date.now()
-    }));
-  }catch(e){ /* localStorage indisponível/cheio — segue sem cache, sem quebrar a página */ }
+    const raw = localStorage.getItem(LEGACY_SNAPSHOT_KEY);
+    if(!raw) return false;
+    const c = JSON.parse(raw);
+    if(!c) return false;
+    applyCachedStandings(c);
+    return true;
+  }catch(e){ return false; }
 }
 
-function applySnapshotCache(snap){
-  snap.drivers.forEach(sd=>{ const d=findDriver(sd.name); if(d) Object.assign(d, sd); });
-  snap.teams.forEach(st=>{ const t=findTeam(st.name); if(t) Object.assign(t, st); });
-  raceHistoryData = snap.raceHistoryData || {};
-  raceMetaByRound = snap.raceMetaByRound || {};
-  if(snap.currentRound) currentRound = snap.currentRound;
+function applyCachedStandings(c){
+  if(Array.isArray(c.drivers)){
+    c.drivers.forEach(sd=>{ const d=findDriver(sd.name); if(d) Object.assign(d, sd); });
+  }
+  if(Array.isArray(c.teams)){
+    c.teams.forEach(st=>{ const t=findTeam(st.name); if(t) Object.assign(t, st); });
+  }
+  if(c.raceHistoryData) raceHistoryData = c.raceHistoryData;
+  if(c.raceMetaByRound) raceMetaByRound = c.raceMetaByRound;
+  if(c.currentRound) currentRound = parseInt(c.currentRound) || currentRound;
+  if(c.totalRaces) totalRaces = c.totalRaces;
 }
 
-/* ===== Próxima Corrida: countdown, horários BR, clima e pneus ===== */
+function saveCachedData(){
+  const payload = {
+    v: 4,
+    savedAt: Date.now(),
+    syncedAt,
+    currentRound,
+    totalRaces,
+    scheduleRaces,
+    roundsData,
+    drivers: drivers.map(d=>({...d})),
+    teams: teams.map(t=>({...t})),
+    raceHistoryData,
+    raceMetaByRound
+  };
+  try{
+    localStorage.setItem(CACHE_KEY, JSON.stringify(payload));
+    try{ localStorage.removeItem(LEGACY_SNAPSHOT_KEY); }catch(e){}
+  }catch(e){
+    // Se estourar a cota, ainda vale guardar a parte derivada (renderização
+    // instantânea); o histórico bruto será baixado de novo na próxima visita.
+    try{
+      localStorage.setItem(CACHE_KEY, JSON.stringify(Object.assign({}, payload, {roundsData:{}})));
+    }catch(_){ /* localStorage indisponível/cheio — segue sem cache */ }
+  }
+}
+
+/* =========================================================================
+   Próxima Corrida: countdown, horários BR, clima e pneus
+   ========================================================================= */
 let _pcCountdownInterval = null;
+let _weatherInFlight = {};
 
 function fmtDataBR(dateObj){
   return new Intl.DateTimeFormat('pt-BR',{timeZone:'America/Sao_Paulo',weekday:'short',day:'2-digit',month:'2-digit'}).format(dateObj);
@@ -692,6 +873,7 @@ function startCountdown(targetDate){
   if(_pcCountdownInterval) clearInterval(_pcCountdownInterval);
   const elD=document.getElementById('cdDays'), elH=document.getElementById('cdHours'),
         elM=document.getElementById('cdMin'), elS=document.getElementById('cdSec');
+  if(!elD || !elH || !elM || !elS) return;
   function tick(){
     let diff = targetDate - new Date();
     if(diff<0) diff=0;
@@ -740,6 +922,26 @@ function tireRecommendation(w){
     text:'Condições secas e amenas. Equilíbrio entre os compostos <strong>Medium e Hard</strong> é o mais provável.'};
 }
 
+function getWeatherCache(dateStr){
+  try{
+    const all = JSON.parse(localStorage.getItem(WEATHER_KEY)) || {};
+    const item = all[dateStr];
+    if(item && Date.now()-item.savedAt < WEATHER_TTL_MS) return item.data;
+  }catch(e){}
+  return null;
+}
+
+function saveWeatherCache(dateStr, data){
+  try{
+    const all = JSON.parse(localStorage.getItem(WEATHER_KEY)) || {};
+    all[dateStr] = {savedAt: Date.now(), data};
+    const keys = Object.keys(all).sort((a,b)=>all[b].savedAt-all[a].savedAt).slice(0,6);
+    const trimmed = {};
+    keys.forEach(k=>trimmed[k]=all[k]);
+    localStorage.setItem(WEATHER_KEY, JSON.stringify(trimmed));
+  }catch(e){}
+}
+
 async function loadWeatherForRace(lat, lon, dateStr){
   try{
     const target = new Date(dateStr+'T00:00:00');
@@ -759,220 +961,342 @@ async function loadWeatherForRace(lat, lon, dateStr){
   }catch(e){ console.error('Falha ao buscar clima:', e.message); return null; }
 }
 
-// ===== Tempos de setor (S1/S2/S3) via OpenF1 =====
-// A API principal (Jolpica/Ergast) NÃO tem tempos de setor — só o tempo total de Q1/Q2/Q3.
-// A OpenF1 (api.openf1.org) é uma API pública separada, gratuita, com dados desde 2023,
-// que registra o tempo de cada setor por volta. Usamos ela só para essa informação extra.
-// Se não conseguirmos casar com certeza a sessão certa (mesmo ano + mesmo país), preferimos
-// não mostrar setor nenhum a arriscar mostrar o dado errado.
+function weatherCardHTML(weather){
+  const [icon, desc] = weatherInfo(weather.code);
+  const tire = tireRecommendation(weather);
+  return `
+    <div class="weather-card">
+      <h3>🌦️ Clima no dia da corrida</h3>
+      <div class="weather-main">
+        <span class="weather-icon">${icon}</span>
+        <div>
+          <div class="weather-temp">${Math.round(weather.tmin)}° / ${Math.round(weather.tmax)}°C</div>
+          <div class="weather-desc">${desc}</div>
+        </div>
+      </div>
+      <div class="weather-details">
+        Chance de chuva: ${weather.precipProb}%<br>
+        Vento máx.: ${Math.round(weather.wind)} km/h
+      </div>
+    </div>
+    <div class="tire-card">
+      <h3>🏎️ Recomendação de pneus</h3>
+      <span class="tire-badge ${tire.badge}">${tire.label}</span>
+      <div class="tire-rec">${tire.text}</div>
+    </div>
+  `;
+}
+
+function renderWeatherForRace(loc, dateStr){
+  const wtEl = document.getElementById('pcWeatherTire');
+  if(!wtEl || !loc) return;
+  const cached = getWeatherCache(dateStr);
+  if(cached){ wtEl.innerHTML = weatherCardHTML(cached); return; }
+
+  wtEl.innerHTML = `<div class="pc-unavailable" style="grid-column:1/-1">Carregando previsão do tempo...</div>`;
+
+  const key = `${loc.lat},${loc.long},${dateStr}`;
+  if(_weatherInFlight[key]) return;
+  _weatherInFlight[key] = loadWeatherForRace(loc.lat, loc.long, dateStr)
+    .then(weather=>{
+      if(weather){
+        saveWeatherCache(dateStr, weather);
+        wtEl.innerHTML = weatherCardHTML(weather);
+      }else{
+        wtEl.innerHTML = `<div class="pc-unavailable" style="grid-column:1/-1">Previsão do tempo ainda não disponível para esta corrida (fica acessível a partir de ~15 dias antes da data).</div>`;
+      }
+    })
+    .catch(()=>{})
+    .finally(()=>{ delete _weatherInFlight[key]; });
+}
+
+/* =========================================================================
+   Tempos de setor (S1/S2/S3) via OpenF1
+   =========================================================================
+   A API principal (Jolpica/Ergast) NÃO tem tempos de setor — só o tempo total.
+   A OpenF1 é usada apenas para essa informação extra. O endpoint /laps devolve
+   um JSON grande (todas as voltas da sessão), então o resultado é cacheado por
+   24 h: antes ele era baixado a cada abertura da página, atrasando o grid. */
+
 function normStr(s){
   return (s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
 }
 
-async function fetchOpenF1SectorTimes(year, countryName){
+function readSectorCache(){
+  try{ return JSON.parse(localStorage.getItem(SECTOR_KEY)) || {}; }
+  catch(e){ return {}; }
+}
+
+function getSectorCache(key){
+  const all = readSectorCache();
+  const item = all[key];
+  if(!item) return {hit:false, data:null};
+  if(Date.now()-item.savedAt > SECTOR_TTL_MS) return {hit:false, data:null};
+  return {hit:true, data:item.data};
+}
+
+function saveSectorCache(key, data){
   try{
-    const sessions = await fetchJSONWithRetry(`https://api.openf1.org/v1/sessions?year=${year}&session_name=Qualifying`, 2, 500);
-    if(!sessions || !sessions.length) return null;
-    const rc = normStr(countryName);
-    const session = sessions.find(s=>{
-      const sc = normStr(s.country_name);
-      return sc && rc && (sc.includes(rc) || rc.includes(sc));
-    });
-    if(!session) return null; // sem correspondência segura — não arrisca mostrar setor de outra corrida
+    const all = readSectorCache();
+    all[key] = {savedAt: Date.now(), data};
+    const keys = Object.keys(all).sort((a,b)=>all[b].savedAt-all[a].savedAt).slice(0,8);
+    const trimmed = {};
+    keys.forEach(k=>trimmed[k]=all[k]);
+    localStorage.setItem(SECTOR_KEY, JSON.stringify(trimmed));
+  }catch(e){}
+}
 
-    const [drivers, laps] = await Promise.all([
-      fetchJSONWithRetry(`https://api.openf1.org/v1/drivers?session_key=${session.session_key}`, 2, 500),
-      fetchJSONWithRetry(`https://api.openf1.org/v1/laps?session_key=${session.session_key}`, 2, 500)
-    ]);
-    if(!drivers || !laps || !laps.length) return null;
+let _sectorInFlight = {};
 
-    const nameByNumber = {};
-    drivers.forEach(d=>{ if(d.full_name) nameByNumber[d.driver_number] = d.full_name; });
+async function fetchOpenF1SectorTimes(year, countryName, round){
+  const cacheKey = `${year}_${round}`;
+  const cached = getSectorCache(cacheKey);
+  if(cached.hit) return cached.data;
+  if(_sectorInFlight[cacheKey]) return _sectorInFlight[cacheKey];
 
-    const bestLapByDriver = {};    // volta mais rápida de cada piloto (define o tempo total exibido)
-    const bestSectorByDriver = {}; // melhor S1/S2/S3 do piloto entre TODAS as voltas da sessão
-    laps.forEach(l=>{
-      if(l.is_pit_out_lap) return;
-      const num = l.driver_number;
-      const bs = bestSectorByDriver[num] = bestSectorByDriver[num] || {s1:null,s2:null,s3:null};
-      if(l.duration_sector_1!=null && (bs.s1==null || l.duration_sector_1<bs.s1)) bs.s1 = l.duration_sector_1;
-      if(l.duration_sector_2!=null && (bs.s2==null || l.duration_sector_2<bs.s2)) bs.s2 = l.duration_sector_2;
-      if(l.duration_sector_3!=null && (bs.s3==null || l.duration_sector_3<bs.s3)) bs.s3 = l.duration_sector_3;
-      if(l.lap_duration!=null){
-        const cur = bestLapByDriver[num];
-        if(!cur || l.lap_duration<cur.lap_duration) bestLapByDriver[num] = l;
+  _sectorInFlight[cacheKey] = (async ()=>{
+    try{
+      const sessions = await fetchJSONWithRetry(`https://api.openf1.org/v1/sessions?year=${year}&session_name=Qualifying`, 2, 500);
+      if(!sessions || !sessions.length){
+        saveSectorCache(cacheKey, null);
+        return null;
       }
-    });
+      const rc = normStr(countryName);
+      const session = sessions.find(s=>{
+        const sc = normStr(s.country_name);
+        return sc && rc && (sc.includes(rc) || rc.includes(sc));
+      });
+      if(!session){ // sem correspondência segura — não arrisca mostrar setor de outra corrida
+        saveSectorCache(cacheKey, null);
+        return null;
+      }
 
-    const byDriverName = {};
-    Object.keys(bestLapByDriver).forEach(num=>{
-      const fullName = nameByNumber[num];
-      if(!fullName) return;
-      const lap = bestLapByDriver[num];
-      if(lap.duration_sector_1==null || lap.duration_sector_2==null || lap.duration_sector_3==null) return;
-      byDriverName[normStr(fullName)] = {
-        s1: lap.duration_sector_1, s2: lap.duration_sector_2, s3: lap.duration_sector_3,
-        personalBest: bestSectorByDriver[num]
-      };
+      const [drivers, laps] = await Promise.all([
+        fetchJSONWithRetry(`https://api.openf1.org/v1/drivers?session_key=${session.session_key}`, 2, 500),
+        fetchJSONWithRetry(`https://api.openf1.org/v1/laps?session_key=${session.session_key}`, 2, 500)
+      ]);
+      if(!drivers || !laps || !laps.length){
+        saveSectorCache(cacheKey, null);
+        return null;
+      }
+
+      const nameByNumber = {};
+      drivers.forEach(d=>{ if(d.full_name) nameByNumber[d.driver_number] = d.full_name; });
+
+      const bestLapByDriver = {};    // volta mais rápida de cada piloto (define o tempo total exibido)
+      const bestSectorByDriver = {}; // melhor S1/S2/S3 do piloto entre TODAS as voltas da sessão
+      laps.forEach(l=>{
+        if(l.is_pit_out_lap) return;
+        const num = l.driver_number;
+        const bs = bestSectorByDriver[num] = bestSectorByDriver[num] || {s1:null,s2:null,s3:null};
+        if(l.duration_sector_1!=null && (bs.s1==null || l.duration_sector_1<bs.s1)) bs.s1 = l.duration_sector_1;
+        if(l.duration_sector_2!=null && (bs.s2==null || l.duration_sector_2<bs.s2)) bs.s2 = l.duration_sector_2;
+        if(l.duration_sector_3!=null && (bs.s3==null || l.duration_sector_3<bs.s3)) bs.s3 = l.duration_sector_3;
+        if(l.lap_duration!=null){
+          const cur = bestLapByDriver[num];
+          if(!cur || l.lap_duration<cur.lap_duration) bestLapByDriver[num] = l;
+        }
+      });
+
+      const byDriverName = {};
+      Object.keys(bestLapByDriver).forEach(num=>{
+        const fullName = nameByNumber[num];
+        if(!fullName) return;
+        const lap = bestLapByDriver[num];
+        if(lap.duration_sector_1==null || lap.duration_sector_2==null || lap.duration_sector_3==null) return;
+        byDriverName[normStr(fullName)] = {
+          s1: lap.duration_sector_1, s2: lap.duration_sector_2, s3: lap.duration_sector_3,
+          personalBest: bestSectorByDriver[num]
+        };
+      });
+      const result = Object.keys(byDriverName).length ? byDriverName : null;
+      saveSectorCache(cacheKey, result);
+      return result;
+    }catch(e){
+      console.warn('Tempos de setor (OpenF1) indisponíveis para esta corrida:', e.message);
+      return null;
+    }finally{
+      delete _sectorInFlight[cacheKey];
+    }
+  })();
+  return _sectorInFlight[cacheKey];
+}
+
+/* =========================================================================
+   Grid de largada / classificação
+   ========================================================================= */
+
+function latestQualifyingRace(now=new Date()){
+  const withQualiDate = scheduleRaces
+    .filter(r=>r.Qualifying)
+    .map(r=>({r, qualDt:new Date(r.Qualifying.date+'T'+(r.Qualifying.time||'00:00:00Z'))}));
+  const pastQuali = withQualiDate.filter(x=>x.qualDt <= now).sort((a,b)=>b.qualDt-a.qualDt);
+  return pastQuali.length ? pastQuali[0].r : null;
+}
+
+function buildGridRows(qualList, resRace, sectorData){
+  const gridByDriverId = {};
+  if(resRace?.Results){
+    resRace.Results.forEach(r=>{
+      const g = parseInt(r.grid);
+      if(Number.isFinite(g)) gridByDriverId[r.Driver.driverId] = g;
     });
-    return Object.keys(byDriverName).length ? byDriverName : null;
-  }catch(e){
-    console.warn('Tempos de setor (OpenF1) indisponíveis para esta corrida:', e.message);
-    return null;
   }
+  const hasOfficialGrid = Object.keys(gridByDriverId).length > 0;
+
+  const rows = qualList.map(res=>{
+    const name = DRIVER_MAP[res.Driver.driverId] || `${res.Driver.givenName} ${res.Driver.familyName}`;
+    const teamName = TEAM_MAP[res.Constructor?.constructorId] || res.Constructor?.name || '—';
+    const teamColor = TEAM_COLORS[teamName] || '#666';
+    const qualPos = parseInt(res.position);
+    const bestTime = res.Q3 || res.Q2 || res.Q1 || null;
+    const officialGrid = hasOfficialGrid ? gridByDriverId[res.Driver.driverId] : null;
+    const finalPos = (officialGrid!=null && !isNaN(officialGrid)) ? officialGrid : qualPos;
+    const penalized = officialGrid!=null && !isNaN(officialGrid) && officialGrid!==qualPos;
+    const penaltyText = !penalized ? '' : (officialGrid>qualPos
+      ? `⚠️ Penalidade: P${qualPos} → P${officialGrid}`
+      : `Ajuste: P${qualPos} → P${officialGrid}`);
+    const sector = sectorData ? sectorData[normStr(name)] : null;
+    return {finalPos, qualPos, name, teamName, teamColor, bestTime, penalized, penaltyText, sector};
+  }).sort((a,b)=>a.finalPos-b.finalPos);
+
+  // Diferença de tempo para o mais rápido da classificação (referência é sempre o tempo em si,
+  // não a posição de largada — então uma punição de grid não muda quem é o "líder" do cronômetro).
+  function parseLapTimeToSeconds(t){
+    if(!t) return null;
+    const parts = t.split(':');
+    const val = parts.length===2 ? parseInt(parts[0])*60 + parseFloat(parts[1]) : parseFloat(t);
+    return isNaN(val) ? null : val;
+  }
+  rows.forEach(r=>{ r.timeSec = parseLapTimeToSeconds(r.bestTime); });
+  const leaderRow = rows.filter(r=>r.timeSec!=null).sort((a,b)=>a.qualPos-b.qualPos)[0];
+  const poleTimeSec = leaderRow ? leaderRow.timeSec : null;
+  rows.forEach(r=>{
+    r.timeDisplay = r.bestTime || '—';
+    if(r.timeSec==null){ r.gapDisplay = '—'; return; }
+    if(r === leaderRow){ r.gapDisplay = '—'; return; }
+    if(poleTimeSec==null){ r.gapDisplay = '—'; return; }
+    const gap = r.timeSec - poleTimeSec;
+    r.gapDisplay = '+'+gap.toFixed(3)+'s';
+  });
+
+  return {rows, hasOfficialGrid};
+}
+
+function renderGrid(qualRace, race, rows, hasOfficialGrid){
+  const section = document.getElementById('gridLargadaSection');
+  if(!section) return;
+
+  document.getElementById('glRaceName').textContent = qualRace.raceName || race.raceName;
+  const loc = qualRace.Circuit?.Location || race.Circuit?.Location;
+  document.getElementById('glCircuit').textContent =
+    `${qualRace.Circuit?.circuitName || race.Circuit?.circuitName || ''}${loc?' · '+loc.locality+', '+loc.country:''}`;
+
+  const hasSectorData = rows.some(r=>r.sector);
+  if(hasSectorData){
+    ['s1','s2','s3'].forEach(key=>{
+      const vals = rows.filter(r=>r.sector && r.sector[key]!=null).map(r=>r.sector[key]);
+      if(!vals.length) return;
+      const best = Math.min(...vals), worst = Math.max(...vals);
+      rows.forEach(r=>{
+        if(!r.sector || r.sector[key]==null) return;
+        const v = r.sector[key];
+        const pb = r.sector.personalBest ? r.sector.personalBest[key] : null;
+        let cls = '';
+        if(Math.abs(v-best)<0.0005) cls='purple';
+        else if(pb!=null && Math.abs(v-pb)<0.0005) cls='green';
+        else if(worst>best && Math.abs(v-worst)<0.0005) cls='yellow';
+        r['cls_'+key] = cls;
+      });
+    });
+  }
+
+  const noteEl = document.getElementById('glNote');
+  if(noteEl){
+    let note = hasOfficialGrid
+      ? 'Grid de largada oficial — já considera eventuais penalidades aplicadas pelos comissários após a classificação.'
+      : 'Classificação por tempo. O grid de largada oficial é definido pela FIA e pode mudar se houver penalidade — esta lista atualiza sozinha assim que isso for publicado.';
+    note += hasSectorData
+      ? ' Setores via OpenF1: roxo = melhor tempo de todos nesse setor · verde = melhor tempo do próprio piloto nesse setor · amarelo = pior tempo de todos (marcação extra deste site, não usada na transmissão oficial).'
+      : ' Tempos de setor ainda não disponíveis para esta sessão.';
+    noteEl.textContent = note;
+  }
+
+  function fmtSector(v){ return v==null ? '—' : v.toFixed(3); }
+
+  const groupBanner = `<div class="gl-group-banner">⚙️ Ajustes de Posição${hasSectorData?' e Setores':''}</div>`;
+
+  const headerRow = `
+    <div class="gl-row gl-header ${hasSectorData?'has-sectors':''}">
+      <div class="gl-pos">#</div>
+      <div class="gl-driver">Piloto</div>
+      ${hasSectorData ? '<div class="gl-sector">S1</div><div class="gl-sector">S2</div><div class="gl-sector">S3</div>' : ''}
+      <div class="gl-penalty">Ajuste</div>
+      <div class="gl-time">Tempo</div>
+      <div class="gl-gap">Dif.</div>
+    </div>`;
+
+  document.getElementById('glTable').innerHTML = groupBanner + headerRow + rows.map(r=>`
+    <div class="gl-row ${hasSectorData?'has-sectors':''} ${r.penalized?'penalized':''}">
+      <div class="gl-pos">${r.finalPos}</div>
+      <div class="gl-driver">
+        <span class="gl-team-dot" style="background:${r.teamColor}"></span>
+        <div style="min-width:0">
+          <div class="gl-driver-name">${r.name}</div>
+          <div class="gl-team-name">${r.teamName}</div>
+        </div>
+      </div>
+      ${hasSectorData ? `
+      <div class="gl-sector ${r.sector?(r['cls_s1']||''):'dash'}">${r.sector?fmtSector(r.sector.s1):'—'}</div>
+      <div class="gl-sector ${r.sector?(r['cls_s2']||''):'dash'}">${r.sector?fmtSector(r.sector.s2):'—'}</div>
+      <div class="gl-sector ${r.sector?(r['cls_s3']||''):'dash'}">${r.sector?fmtSector(r.sector.s3):'—'}</div>
+      ` : ''}
+      <div class="gl-penalty">${r.penaltyText ? `<span class="gl-penalty-pill">${r.penaltyText}</span>` : `<span class="gl-penalty-dash">—</span>`}</div>
+      <div class="gl-time">${r.timeDisplay}</div>
+      <div class="gl-gap">${r.gapDisplay}</div>
+    </div>
+  `).join('');
+
+  section.style.display = 'block';
 }
 
 async function loadGridLargadaWidget(race){
   const section = document.getElementById('gridLargadaSection');
   if(!section) return;
-  try{
-    const round = race.round;
-    // Busca a classificação (tempos/posição por tempo) e, se já existir, o resultado da corrida
-    // (única fonte que carrega o grid OFICIAL após punições da FIA). Antes da corrida acontecer,
-    // results.json ainda não existe para esta etapa — nesse caso mostramos a posição por tempo
-    // e deixamos claro que o grid oficial pode mudar. Assim que a FIA publica o resultado (ou
-    // após a corrida), a próxima sincronização já traz o grid definitivo automaticamente.
-    const [qualJson, resJson, sectorData] = await Promise.all([
-      fetchJSONWithRetry(`${API_BASE}/${round}/qualifying.json?limit=50`),
-      fetchJSONWithRetry(`${API_BASE}/${round}/results.json?limit=50`),
-      fetchOpenF1SectorTimes(race.date ? race.date.slice(0,4) : new Date().getFullYear(), race.Circuit?.Location?.country)
-    ]);
-    const qualRace = qualJson?.MRData?.RaceTable?.Races?.[0];
-    const resRace = resJson?.MRData?.RaceTable?.Races?.[0];
-    const qualList = qualRace?.QualifyingResults || [];
-    if(!qualList.length){ section.style.display='none'; return; }
+  if(!race){ section.style.display='none'; return; }
 
-    const gridByDriverId = {};
-    if(resRace?.Results){
-      resRace.Results.forEach(r=>{ gridByDriverId[r.Driver.driverId] = parseInt(r.grid); });
-    }
-    const hasOfficialGrid = Object.keys(gridByDriverId).length > 0;
+  const round = roundKey(race.round);
+  const qualRace = roundsData[round]?.qualifying;
+  const resRace = roundsData[round]?.results;
+  const qualList = qualRace?.QualifyingResults || [];
+  if(!qualList.length){ section.style.display='none'; return; }
 
-    document.getElementById('glRaceName').textContent = qualRace.raceName || race.raceName;
-    const loc = qualRace.Circuit?.Location || race.Circuit?.Location;
-    document.getElementById('glCircuit').textContent =
-      `${qualRace.Circuit?.circuitName || race.Circuit?.circuitName || ''}${loc?' · '+loc.locality+', '+loc.country:''}`;
+  const year = (race.date || qualRace.date || '').slice(0,4) || String(new Date().getFullYear());
+  const country = race.Circuit?.Location?.country || qualRace.Circuit?.Location?.country;
+  const cacheKey = `${year}_${round}`;
+  const cached = getSectorCache(cacheKey);
 
-    const noteEl = document.getElementById('glNote');
-    if(noteEl) noteEl.textContent = hasOfficialGrid
-      ? 'Grid de largada oficial — já considera eventuais penalidades aplicadas pelos comissários após a classificação.'
-      : 'Classificação por tempo. O grid de largada oficial é definido pela FIA e pode mudar se houver penalidade — esta lista atualiza sozinha assim que isso for publicado.';
+  const base = buildGridRows(qualList, resRace, cached.hit ? cached.data : null);
+  renderGrid(qualRace, race, base.rows, base.hasOfficialGrid);
 
-    const rows = qualList.map(res=>{
-      const name = DRIVER_MAP[res.Driver.driverId] || `${res.Driver.givenName} ${res.Driver.familyName}`;
-      const teamName = TEAM_MAP[res.Constructor?.constructorId] || res.Constructor?.name || '—';
-      const teamColor = TEAM_COLORS[teamName] || '#666';
-      const qualPos = parseInt(res.position);
-      const bestTime = res.Q3 || res.Q2 || res.Q1 || null;
-      const officialGrid = hasOfficialGrid ? gridByDriverId[res.Driver.driverId] : null;
-      const finalPos = (officialGrid!=null && !isNaN(officialGrid)) ? officialGrid : qualPos;
-      const penalized = officialGrid!=null && !isNaN(officialGrid) && officialGrid!==qualPos;
-      const penaltyText = !penalized ? '' : (officialGrid>qualPos
-        ? `⚠️ Penalidade: P${qualPos} → P${officialGrid}`
-        : `Ajuste: P${qualPos} → P${officialGrid}`);
-      const sector = sectorData ? sectorData[normStr(name)] : null;
-      return {finalPos, qualPos, name, teamName, teamColor, bestTime, penalized, penaltyText, sector};
-    }).sort((a,b)=>a.finalPos-b.finalPos);
-
-    // Classificação de cor por setor, como na transmissão oficial: roxo = melhor tempo de TODOS
-    // os pilotos naquele setor; verde = melhor tempo do PRÓPRIO piloto naquele setor (mesmo que
-    // tenha sido em outra volta); amarelo = pior tempo de todos os pilotos naquele setor (a pedido
-    // do usuário — vale notar que a transmissão oficial da F1 não usa essa terceira cor, ela só
-    // usa roxo/verde/branco; deixei o amarelo aqui como uma marcação extra deste site).
-    const hasSectorData = rows.some(r=>r.sector);
-    if(noteEl){
-      noteEl.textContent += hasSectorData
-        ? ' Setores via OpenF1: roxo = melhor tempo de todos nesse setor · verde = melhor tempo do próprio piloto nesse setor · amarelo = pior tempo de todos (marcação extra deste site, não usada na transmissão oficial).'
-        : ' Tempos de setor ainda não disponíveis para esta sessão.';
-    }
-    if(hasSectorData){
-      ['s1','s2','s3'].forEach(key=>{
-        const vals = rows.filter(r=>r.sector && r.sector[key]!=null).map(r=>r.sector[key]);
-        if(!vals.length) return;
-        const best = Math.min(...vals), worst = Math.max(...vals);
-        rows.forEach(r=>{
-          if(!r.sector || r.sector[key]==null) return;
-          const v = r.sector[key];
-          const pb = r.sector.personalBest ? r.sector.personalBest[key] : null;
-          let cls = '';
-          if(Math.abs(v-best)<0.0005) cls='purple';
-          else if(pb!=null && Math.abs(v-pb)<0.0005) cls='green';
-          else if(worst>best && Math.abs(v-worst)<0.0005) cls='yellow';
-          r['cls_'+key] = cls;
-        });
-      });
-    }
-
-    // Diferença de tempo para o mais rápido da classificação (referência é sempre o tempo em si,
-    // não a posição de largada — então uma punição de grid não muda quem é o "líder" do cronômetro).
-    // Ex.: "1m20.123s" e "1m20.183s" viram "+0.060s" (60 milésimos), como nos telões oficiais da F1.
-    function parseLapTimeToSeconds(t){
-      if(!t) return null;
-      const parts = t.split(':');
-      const val = parts.length===2 ? parseInt(parts[0])*60 + parseFloat(parts[1]) : parseFloat(t);
-      return isNaN(val) ? null : val;
-    }
-    rows.forEach(r=>{ r.timeSec = parseLapTimeToSeconds(r.bestTime); });
-    const leaderRow = rows.filter(r=>r.timeSec!=null).sort((a,b)=>a.qualPos-b.qualPos)[0];
-    const poleTimeSec = leaderRow ? leaderRow.timeSec : null;
-    rows.forEach(r=>{
-      r.timeDisplay = r.bestTime || '—'; // sempre o tempo absoluto do próprio piloto
-      if(r.timeSec==null){ r.gapDisplay = '—'; return; }
-      if(r === leaderRow){ r.gapDisplay = '—'; return; }
-      if(poleTimeSec==null){ r.gapDisplay = '—'; return; }
-      const gap = r.timeSec - poleTimeSec;
-      r.gapDisplay = '+'+gap.toFixed(3)+'s';
-    });
-
-    function fmtSector(v){ return v==null ? '—' : v.toFixed(3); }
-
-    const groupBanner = `<div class="gl-group-banner">⚙️ Ajustes de Posição${hasSectorData?' e Setores':''}</div>`;
-
-    const headerRow = `
-      <div class="gl-row gl-header ${hasSectorData?'has-sectors':''}">
-        <div class="gl-pos">#</div>
-        <div class="gl-driver">Piloto</div>
-        ${hasSectorData ? '<div class="gl-sector">S1</div><div class="gl-sector">S2</div><div class="gl-sector">S3</div>' : ''}
-        <div class="gl-penalty">Ajuste</div>
-        <div class="gl-time">Tempo</div>
-        <div class="gl-gap">Dif.</div>
-      </div>`;
-
-    document.getElementById('glTable').innerHTML = groupBanner + headerRow + rows.map(r=>`
-      <div class="gl-row ${hasSectorData?'has-sectors':''} ${r.penalized?'penalized':''}">
-        <div class="gl-pos">${r.finalPos}</div>
-        <div class="gl-driver">
-          <span class="gl-team-dot" style="background:${r.teamColor}"></span>
-          <div style="min-width:0">
-            <div class="gl-driver-name">${r.name}</div>
-            <div class="gl-team-name">${r.teamName}</div>
-          </div>
-        </div>
-        ${hasSectorData ? `
-        <div class="gl-sector ${r.sector?(r['cls_s1']||''):'dash'}">${r.sector?fmtSector(r.sector.s1):'—'}</div>
-        <div class="gl-sector ${r.sector?(r['cls_s2']||''):'dash'}">${r.sector?fmtSector(r.sector.s2):'—'}</div>
-        <div class="gl-sector ${r.sector?(r['cls_s3']||''):'dash'}">${r.sector?fmtSector(r.sector.s3):'—'}</div>
-        ` : ''}
-        <div class="gl-penalty">${r.penaltyText ? `<span class="gl-penalty-pill">${r.penaltyText}</span>` : `<span class="gl-penalty-dash">—</span>`}</div>
-        <div class="gl-time">${r.timeDisplay}</div>
-        <div class="gl-gap">${r.gapDisplay}</div>
-      </div>
-    `).join('');
-
-    section.style.display = 'block';
-  }catch(e){
-    console.error('Falha ao montar grid de largada:', e.message);
-    section.style.display = 'none';
-  }
+  if(cached.hit) return;
+  const sectorData = await fetchOpenF1SectorTimes(year, country, round);
+  if(!sectorData) return;
+  const updated = buildGridRows(qualList, resRace, sectorData);
+  renderGrid(qualRace, race, updated.rows, updated.hasOfficialGrid);
 }
 
-async function loadNextRaceWidget(racesRes){
+/* =========================================================================
+   Widget da próxima corrida
+   ========================================================================= */
+
+function loadNextRaceWidget(races){
   const section = document.getElementById('proximaCorridaSection');
   if(!section) return;
+  const list = Array.isArray(races) ? races : scheduleRaces;
   try{
-    const races = racesRes?.MRData?.RaceTable?.Races || [];
     const now = new Date();
-    const withDate = races.map(r=>({r, dt:new Date(r.date+'T'+(r.time||'00:00:00Z'))}));
+    const withDate = (list || []).map(r=>({r, dt:new Date(r.date+'T'+(r.time||'00:00:00Z'))}));
     const upcoming = withDate.filter(x=>x.dt >= now).sort((a,b)=>a.dt-b.dt);
     if(!upcoming.length){ section.style.display='none'; return; }
     const {r: race, dt: raceDateTime} = upcoming[0];
@@ -992,7 +1316,7 @@ async function loadNextRaceWidget(racesRes){
     ];
     let sessionEntries = sessionDefs
       .filter(s=>race[s.key])
-      .map(s=>({label:s.label, dt:new Date(race[s.key].date+'T'+race[s.key].time), race:false}));
+      .map(s=>({label:s.label, dt:new Date(race[s.key].date+'T'+(race[s.key].time||'00:00:00Z')), race:false}));
     sessionEntries.push({label:'Corrida', dt:raceDateTime, race:true});
     sessionEntries.sort((a,b)=>a.dt-b.dt);
 
@@ -1006,54 +1330,21 @@ async function loadNextRaceWidget(racesRes){
 
     startCountdown(raceDateTime);
 
-    // O grid de largada/classificação NÃO segue a "próxima corrida" da contagem regressiva —
-    // assim que a corrida do fim de semana atual começa (ou termina), a contagem regressiva já
-    // avança para a etapa seguinte, que ainda nem tem classificação disputada. Por isso aqui a
-    // etapa usada é sempre a última cuja Classificação já aconteceu de fato, mantendo o grid
-    // visível durante toda a corrida e até a próxima classificação real acontecer.
-    const withQualiDate = races
-      .filter(r=>r.Qualifying)
-      .map(r=>({r, qualDt: new Date(r.Qualifying.date+'T'+r.Qualifying.time)}));
-    const pastQuali = withQualiDate.filter(x=>x.qualDt <= now).sort((a,b)=>b.qualDt-a.qualDt);
-    const gridRace = pastQuali.length ? pastQuali[0].r : null;
-    if(gridRace) loadGridLargadaWidget(gridRace); // busca independente, com seu próprio tratamento de erro
-    else { const gl = document.getElementById('gridLargadaSection'); if(gl) gl.style.display='none'; }
-
-
-    const wtEl = document.getElementById('pcWeatherTire');
-    if(loc){
-      const weather = await loadWeatherForRace(loc.lat, loc.long, race.date);
-      if(weather){
-        const [icon, desc] = weatherInfo(weather.code);
-        const tire = tireRecommendation(weather);
-        wtEl.innerHTML = `
-          <div class="weather-card">
-            <h3>🌦️ Clima no dia da corrida</h3>
-            <div class="weather-main">
-              <span class="weather-icon">${icon}</span>
-              <div>
-                <div class="weather-temp">${Math.round(weather.tmin)}° / ${Math.round(weather.tmax)}°C</div>
-                <div class="weather-desc">${desc}</div>
-              </div>
-            </div>
-            <div class="weather-details">
-              Chance de chuva: ${weather.precipProb}%<br>
-              Vento máx.: ${Math.round(weather.wind)} km/h
-            </div>
-          </div>
-          <div class="tire-card">
-            <h3>🏎️ Recomendação de pneus</h3>
-            <span class="tire-badge ${tire.badge}">${tire.label}</span>
-            <div class="tire-rec">${tire.text}</div>
-          </div>
-        `;
-      } else {
-        wtEl.innerHTML = `<div class="pc-unavailable" style="grid-column:1/-1">Previsão do tempo ainda não disponível para esta corrida (fica acessível a partir de ~15 dias antes da data).</div>`;
-      }
-    } else {
-      wtEl.innerHTML = '';
+    // O grid usa sempre a última classificação que já aconteceu de fato (não a
+    // "próxima corrida", que pode ainda não ter classificação disputada).
+    const gridRace = latestQualifyingRace(now);
+    if(gridRace && roundsData[roundKey(gridRace.round)]?.qualifying){
+      loadGridLargadaWidget(gridRace); // renderização imediata com o cache
+    }else{
+      const gl = document.getElementById('gridLargadaSection');
+      if(gl) gl.style.display='none';
     }
 
+    if(loc) renderWeatherForRace(loc, race.date);
+    else {
+      const wtEl = document.getElementById('pcWeatherTire');
+      if(wtEl) wtEl.innerHTML = '';
+    }
     section.style.display = 'block';
   }catch(e){
     console.error('Falha ao montar widget da próxima corrida:', e.message);
@@ -1061,323 +1352,468 @@ async function loadNextRaceWidget(racesRes){
   }
 }
 
-async function fetchLiveData(){
-  try{
-    const heroSt = document.getElementById('heroStatus');
-    if(heroSt) heroSt.textContent='Buscando dados atualizados da F1...';
-
-    // Passo 1: dados "leves" e de página única (não sofrem corte de paginação)
-    const [drvRes, conRes, racesRes] = await Promise.all([
-      fetch(API_BASE+'/driverstandings.json?limit=100').then(r=>r.json()),
-      fetch(API_BASE+'/constructorstandings.json?limit=100').then(r=>r.json()),
-      fetch(API_BASE+'/races.json?limit=100').then(r=>r.json()).catch(()=>null)
-    ]);
-    const totalRaces = racesRes ? parseInt(racesRes.MRData.total) : null;
-    const officialRoundEarly = parseInt(drvRes.MRData.StandingsTable.StandingsLists[0]?.round) || 0;
-    if(officialRoundEarly>0) currentRound = officialRoundEarly;
-
-    // Passo 2: resultados/classificação buscados ETAPA POR ETAPA (evita o limite de
-    // paginação do endpoint agregado, que só devolve as primeiras ~5 corridas da temporada).
-    // IMPORTANTE: as até 33 chamadas (11 etapas x 3 endpoints) NÃO são mais disparadas todas de
-    // uma vez — isso estourava o burst limit de 4 req/s da API e gerava 429s aleatórios.
-    // Agora vão em lotes pequenos e espaçados, com retry automático em caso de 429/erro de rede.
-    const roundUrls = [];
-    for(let rnd=1; rnd<=currentRound; rnd++){
-      roundUrls.push({rnd, type:'results',    url:`${API_BASE}/${rnd}/results.json?limit=50`});
-      roundUrls.push({rnd, type:'qualifying', url:`${API_BASE}/${rnd}/qualifying.json?limit=50`});
-      roundUrls.push({rnd, type:'sprint',     url:`${API_BASE}/${rnd}/sprint.json?limit=50`});
-    }
-    const roundResponses = await fetchInBatches(roundUrls.map(u=>u.url), 3, 900);
-    const raceResults = [], qualResults = [], sprintResults = [];
-    roundUrls.forEach((u,idx)=>{
-      const race = roundResponses[idx]?.MRData?.RaceTable?.Races?.[0];
-      if(!race) return;
-      if(u.type==='results') raceResults.push(race);
-      else if(u.type==='qualifying') qualResults.push(race);
-      else sprintResults.push(race);
-    });
-
-    const drvList = drvRes.MRData.StandingsTable.StandingsLists[0]?.DriverStandings || [];
-    const conList = conRes.MRData.StandingsTable.StandingsLists[0]?.ConstructorStandings || [];
-
-    // ===== Equipe ATUAL de cada piloto (para refletir substituições no meio da temporada,
-    // como Lawson assumindo a vaga do Hadjar machucado na Red Bull, e Tsunoda entrando na
-    // Racing Bulls no lugar do Lawson) — usa a equipe da corrida de round mais alto em que o
-    // piloto apareceu, em vez de um valor fixo definido no início da temporada.
-    const currentTeamByDriver = {};
-    const lastRoundSeenByDriver = {};
-    raceResults.forEach(race=>{
-      if(!race.Results) return;
-      const rnd = parseInt(race.round);
-      race.Results.forEach(res=>{
-        const name = DRIVER_MAP[res.Driver.driverId];
-        const teamName = TEAM_MAP[res.Constructor?.constructorId];
-        if(!name || !teamName) return;
-        if(!(name in lastRoundSeenByDriver) || rnd>=lastRoundSeenByDriver[name]){
-          lastRoundSeenByDriver[name] = rnd;
-          currentTeamByDriver[name] = teamName;
-        }
-      });
-    });
-    const driversByTeam = {};
-    const latestRoundWithResults = raceResults.reduce((max,race)=>race.Results&&race.Results.length?Math.max(max,parseInt(race.round)):max, 0);
-    const latestRace = raceResults.find(race=>parseInt(race.round)===latestRoundWithResults);
-    if(latestRace && latestRace.Results){
-      latestRace.Results.forEach(res=>{
-        const name = DRIVER_MAP[res.Driver.driverId];
-        const teamName = TEAM_MAP[res.Constructor?.constructorId];
-        if(!name || !teamName) return;
-        (driversByTeam[teamName] = driversByTeam[teamName]||[]).push(name);
-      });
-    }
-
-    const stats = {};
-    Object.values(DRIVER_MAP).forEach(n=>{ stats[n]={wins:0,poles:0,podiums:0,p2:0,p3:0,sprintWins:0,fastestLaps:0,q3:0,bestQuali:99,crash:0,mechanic:0}; });
-
-    const teamStats = {};
-    Object.values(TEAM_MAP).forEach(n=>{ teamStats[n]={poles:0,podiums:0,sprintWins:0,crash:0,mechanic:0}; });
-
-    // Classifica o motivo de não-finalização a partir do campo "status" da API
-    function classifyStatus(status){
-      if(!status) return null;
-      if(isClassifiedFinishStatus(status)) return 'finished';
-      if(['Disqualified','Did not qualify','Did not start','Withdrew','Excluded'].includes(status)) return 'other';
-      const crashKeywords = ['Accident','Collision','Spun off','Damage','Debris'];
-      if(crashKeywords.some(k=>status.includes(k))) return 'crash';
-      return 'mechanic';
-    }
-
-    raceResults.forEach(race=>{
-      if(!race.Results) return;
-      race.Results.forEach(res=>{
-        const name = DRIVER_MAP[res.Driver.driverId];
-        const teamName = TEAM_MAP[res.Constructor?.constructorId];
-        const pos = parseInt(res.position);
-        const cls = classifyStatus(res.status);
-        if(name && stats[name]){
-          if(pos===1) stats[name].wins++;
-          if(pos<=3) stats[name].podiums++;
-          if(pos===2) stats[name].p2++;
-          if(pos===3) stats[name].p3++;
-          if(res.FastestLap && res.FastestLap.rank==='1') stats[name].fastestLaps++;
-          if(cls==='crash') stats[name].crash++;
-          if(cls==='mechanic') stats[name].mechanic++;
-        }
-        if(teamName && teamStats[teamName]){
-          if(pos<=3) teamStats[teamName].podiums++;
-          if(cls==='crash') teamStats[teamName].crash++;
-          if(cls==='mechanic') teamStats[teamName].mechanic++;
-        }
-      });
-    });
-
-    qualResults.forEach(race=>{
-      race.QualifyingResults.forEach(res=>{
-        const name = DRIVER_MAP[res.Driver.driverId];
-        const teamName = TEAM_MAP[res.Constructor?.constructorId];
-        const pos = parseInt(res.position);
-        if(name && stats[name]){
-          // Pole = P1 na classificação (mantém a marca mesmo com penalidade de grid aplicada depois)
-          if(pos===1) stats[name].poles++;
-          if(pos<stats[name].bestQuali) stats[name].bestQuali=pos;
-          if(res.Q3 && res.Q3!=='') stats[name].q3++;
-        }
-        if(teamName && teamStats[teamName] && pos===1) teamStats[teamName].poles++;
-      });
-    });
-
-    sprintResults.forEach(race=>{
-      (race.SprintResults||[]).forEach(res=>{
-        const name = DRIVER_MAP[res.Driver.driverId];
-        const teamName = TEAM_MAP[res.Constructor?.constructorId];
-        const pos = parseInt(res.position);
-        if(name && stats[name] && pos===1) stats[name].sprintWins++;
-        if(teamName && teamStats[teamName] && pos===1) teamStats[teamName].sprintWins++;
-      });
-    });
-
-    // Checagem de integridade: agora buscamos etapa por etapa (não mais um endpoint agregado
-    // sujeito a corte de paginação), mas ainda vale confirmar que cada rodada individual
-    // respondeu corretamente antes de sobrescrever os dados revisados manualmente.
-    const officialRound = currentRound;
-    const roundsWithResults = new Set(raceResults.filter(r=>r.Results&&r.Results.length).map(r=>r.round)).size;
-    const roundsWithQuali = new Set(qualResults.filter(r=>r.QualifyingResults&&r.QualifyingResults.length).map(r=>r.round)).size;
-    const resultsComplete = officialRound>0 && roundsWithResults>=officialRound;
-    const qualiComplete = officialRound>0 && roundsWithQuali>=officialRound;
-    if(!resultsComplete || !qualiComplete){
-      console.warn(`Feed da API incompleto (resultados: ${roundsWithResults}/${officialRound}, quali: ${roundsWithQuali}/${officialRound}) — mantendo dados locais revisados para estatísticas derivadas.`);
-    }
-
-    drvList.forEach(d=>{
-      const name = DRIVER_MAP[d.Driver.driverId];
-      const drv = findDriver(name);
-      if(!drv) return;
-      drv.pts = parseInt(d.points);
-      drv.pos = parseInt(d.position);
-      // Atualiza a equipe do piloto conforme a corrida mais recente (cobre substituições/trocas
-      // de time no meio da temporada), e a cor junto, para não mostrar um piloto com a cor da
-      // equipe antiga.
-      const detectedTeam = currentTeamByDriver[name];
-      if(detectedTeam){
-        drv.team = detectedTeam;
-        drv.color = TEAM_COLORS[detectedTeam] || drv.color;
-      }
-      drv.wins = parseInt(d.wins) || stats[name].wins;
-      if(resultsComplete){
-        drv.podiums = stats[name].podiums;
-        drv.p2 = stats[name].p2;
-        drv.p3 = stats[name].p3;
-        drv.fastestLaps = stats[name].fastestLaps;
-        drv.crash = stats[name].crash;
-        drv.mechanic = stats[name].mechanic;
-      }
-      if(qualiComplete){
-        drv.poles = stats[name].poles;
-        drv.q3 = stats[name].q3;
-        if(stats[name].bestQuali<99) drv.bestQuali = stats[name].bestQuali;
-      }
-      drv.sprintWins = stats[name].sprintWins;
-    });
-
-    conList.forEach(c=>{
-      const name = TEAM_MAP[c.Constructor.constructorId];
-      const team = findTeam(name);
-      if(!team) return;
-      team.pts = parseInt(c.points);
-      team.pos = parseInt(c.position);
-      team.wins = parseInt(c.wins);
-      if(teamStats[name]){
-        if(qualiComplete) team.poles = teamStats[name].poles;
-        if(resultsComplete){
-          team.podiums = teamStats[name].podiums;
-          team.crash = teamStats[name].crash;
-          team.mechanic = teamStats[name].mechanic;
-        }
-        team.sprintWins = teamStats[name].sprintWins;
-      }
-      // Atualiza a dupla de pilotos exibida pela equipe conforme quem correu mais recentemente
-      // por ela — cobre substituições no meio da temporada (ex.: "Lindblad, Tsunoda").
-      if(driversByTeam[name] && driversByTeam[name].length){
-        const lineup = driversByTeam[name]
-          .slice()
-          .sort((a,b)=>(findDriver(a)?.pos ?? 99)-(findDriver(b)?.pos ?? 99))
-          .map(n=>n.trim().split(' ').pop());
-        team.drivers = lineup.join(', ');
-      }
-    });
-
-    // ===== Histórico de corridas por piloto (para o balão de resumo por etapa) =====
-    const qualPosByRound = {};
-    qualResults.forEach(race=>{
-      qualPosByRound[race.round] = {};
-      race.QualifyingResults.forEach(res=>{
-        const name = DRIVER_MAP[res.Driver.driverId];
-        if(name) qualPosByRound[race.round][name] = parseInt(res.position);
-      });
-    });
-
-    const sprintByRound = {};
-    sprintResults.forEach(race=>{
-      sprintByRound[race.round] = {};
-      (race.SprintResults||[]).forEach(res=>{
-        const name = DRIVER_MAP[res.Driver.driverId];
-        if(name) sprintByRound[race.round][name] = parseInt(res.position);
-      });
-    });
-
-    const newRaceHistory = {};
-    Object.values(DRIVER_MAP).forEach(n=>{ newRaceHistory[n]=[]; });
-    const newRaceMeta = {};
-
-    raceResults.forEach(race=>{
-      if(!race.Results) return;
-      newRaceMeta[race.round] = {
-        raceName: race.raceName, date: race.date,
-        country: race.Circuit?.Location?.country || ''
-      };
-      race.Results.forEach(res=>{
-        const name = DRIVER_MAP[res.Driver.driverId];
-        if(!name || !newRaceHistory[name]) return;
-        const finish = parseInt(res.position);
-        const grid = parseInt(res.grid);
-        const qualPos = qualPosByRound[race.round]?.[name] ?? null;
-        newRaceHistory[name].push({
-          round: parseInt(race.round),
-          raceName: race.raceName,
-          date: race.date,
-          country: race.Circuit?.Location?.country || '',
-          grid: grid,
-          qualPos: qualPos,
-          finish: finish,
-          points: parseFloat(res.points) || 0,
-          status: res.status,
-          fastestLap: !!(res.FastestLap && res.FastestLap.rank==='1'),
-          sprintFinish: sprintByRound[race.round]?.[name] ?? null
-        });
-      });
-    });
-    Object.values(newRaceHistory).forEach(arr=>arr.sort((a,b)=>b.round-a.round));
-    // Só substitui o histórico exibido se este ciclo trouxe TODAS as etapas; caso contrário,
-    // mantém o que já estava na tela (dado completo anterior) em vez de mostrar etapas faltando.
-    if(resultsComplete){
-      raceHistoryData = newRaceHistory;
-      raceMetaByRound = newRaceMeta;
-    } else if(!Object.keys(raceHistoryData).some(k=>raceHistoryData[k]?.length)){
-      // Não há nenhum dado completo anterior (nem em cache) — melhor mostrar o parcial que nada.
-      raceHistoryData = newRaceHistory;
-      raceMetaByRound = newRaceMeta;
-      console.warn('Histórico de corridas exibido está PARCIAL (sem dado completo anterior disponível).');
-    } else {
-      console.warn('Fetch incompleto nesta sincronização — mantendo o último histórico de corridas completo.');
-    }
-
-    drivers.sort((a,b)=>a.pos-b.pos);
-    teams.sort((a,b)=>a.pos-b.pos);
-    drivers.forEach((d,i)=>d.pos=i+1);
-    teams.forEach((t,i)=>t.pos=i+1);
-
-    // Só grava o snapshot em cache quando o ciclo veio 100% completo — garante que o cache
-    // nunca guarda um estado com corridas faltando.
-    if(resultsComplete && qualiComplete) saveSnapshotCache();
-
-    populateSelects();
-    comparar();
-    renderTabela('pilotos');
-    loadNextRaceWidget(racesRes);
-
-    const round = drvRes.MRData.StandingsTable.StandingsLists[0]?.round;
-    const info = document.getElementById('apiInfo');
-    const syncOk = resultsComplete && qualiComplete;
-    if(info) info.textContent = syncOk
-      ? 'Temporada 2026 · Dados atualizados automaticamente (Jolpica F1 API · Etapa '+round+')'
-      : 'Temporada 2026 · Sincronização parcial nesta atualização — mantendo o último histórico completo (Etapa '+round+')';
-    const lastUpd = document.getElementById('lastUpdated');
-    if(lastUpd){
-      const now = new Date();
-      lastUpd.textContent = syncOk
-        ? 'Sincronizado às '+fmtHoraBR(now)+' (Brasília)'
-        : 'Última sincronização completa mantida (tentativa das '+fmtHoraBR(now)+' ficou parcial)';
-    }
-    if(heroSt) heroSt.textContent='';
-    const footer = document.getElementById('footerInfo');
-    if(footer && round) footer.textContent='Temporada 2026 · Dados ao vivo via Jolpica F1 API · '+round+(totalRaces?' de '+totalRaces:'')+' etapas disputadas · atualiza a cada acesso à página';
-  }catch(e){
-    console.error('API fetch failed:', e.message, e);
-    const info = document.getElementById('apiInfo');
-    if(info) info.textContent='Temporada 2026 · Dados locais (API: '+e.message.substring(0,50)+')';
-    const heroSt = document.getElementById('heroStatus');
-    if(heroSt) heroSt.textContent='Modo offline - dados locais podem estar desatualizados';
-    const histC = document.getElementById('histContainer');
-    if(histC) histC.innerHTML = '<div class="hist-loading">Histórico de corridas indisponível no momento (modo offline). Tente recarregar a página.</div>';
+function refreshGridFromCache(){
+  const race = latestQualifyingRace();
+  if(race) loadGridLargadaWidget(race);
+  else{
+    const section = document.getElementById('gridLargadaSection');
+    if(section) section.style.display='none';
   }
 }
 
-// Aplica o último snapshot 100% completo (se existir) ANTES de buscar dados novos, para a
-// primeira renderização da página já sair correta em vez de usar os valores fixos de exemplo.
-const cachedSnapshot = loadSnapshotCache();
-if(cachedSnapshot) applySnapshotCache(cachedSnapshot);
+/* =========================================================================
+   Dados da temporada: base rápida + histórico em segundo plano
+   ========================================================================= */
 
-fetchLiveData();
+async function fetchSeasonBase(){
+  const [drvRes, conRes, racesRes] = await Promise.all([
+    fetchJSONWithRetry(`${API_BASE}/driverstandings.json?limit=100`),
+    fetchJSONWithRetry(`${API_BASE}/constructorstandings.json?limit=100`),
+    fetchJSONWithRetry(`${API_BASE}/races.json?limit=100`)
+  ]);
+  return {drvRes, conRes, racesRes};
+}
+
+function applyStandings({drvRes, conRes, racesRes}){
+  const lists = drvRes?.MRData?.StandingsTable?.StandingsLists?.[0];
+  const drvList = lists?.DriverStandings || [];
+  const conList = conRes?.MRData?.StandingsTable?.StandingsLists?.[0]?.ConstructorStandings || [];
+
+  const officialRound = parseInt(lists?.round) || 0;
+  if(officialRound > 0) currentRound = officialRound;
+
+  if(racesRes?.MRData?.RaceTable?.Races){
+    scheduleRaces = racesRes.MRData.RaceTable.Races;
+    const total = parseInt(racesRes.MRData.total);
+    totalRaces = Number.isFinite(total) ? total : (scheduleRaces.length || null);
+  }
+
+  drvList.forEach(d=>{
+    const name = DRIVER_MAP[d.Driver.driverId];
+    const drv = findDriver(name);
+    if(!drv) return;
+    drv.pts = parseInt(d.points) || 0;
+    drv.pos = parseInt(d.position) || 99;
+    const wins = parseInt(d.wins);
+    if(Number.isFinite(wins)) drv.wins = wins;
+  });
+
+  conList.forEach(c=>{
+    const name = TEAM_MAP[c.Constructor.constructorId];
+    const team = findTeam(name);
+    if(!team) return;
+    team.pts = parseInt(c.points) || 0;
+    team.pos = parseInt(c.position) || 99;
+    const wins = parseInt(c.wins);
+    if(Number.isFinite(wins)) team.wins = wins;
+  });
+
+  drivers.sort((a,b)=>(a.pos||99)-(b.pos||99));
+  teams.sort((a,b)=>(a.pos||99)-(b.pos||99));
+
+  return {drvList, conList};
+}
+
+// Recalcula estatísticas derivadas (pódios, DNFs, poles, histórico) a partir
+// do cache bruto de todas as etapas disponíveis.
+function rebuildSeasonStats(standings){
+  const drvList = standings?.drvList || [];
+  const conList = standings?.conList || [];
+
+  const raceResults = [], qualResults = [], sprintResults = [];
+  for(let r=1; r<=currentRound; r++){
+    const d = roundsData[roundKey(r)];
+    if(!d) continue;
+    if(d.results?.Results?.length) raceResults.push(d.results);
+    if(d.qualifying?.QualifyingResults?.length) qualResults.push(d.qualifying);
+    if(d.sprint?.SprintResults?.length) sprintResults.push(d.sprint);
+  }
+
+  // ===== Equipe ATUAL de cada piloto (para refletir substituições no meio da temporada,
+  // como Lawson assumindo a vaga do Hadjar machucado na Red Bull, e Tsunoda entrando na
+  // Racing Bulls no lugar do Lawson) — usa a equipe da corrida de round mais alto em que o
+  // piloto apareceu, em vez de um valor fixo definido no início da temporada.
+  const currentTeamByDriver = {};
+  const lastRoundSeenByDriver = {};
+  raceResults.forEach(race=>{
+    if(!race.Results) return;
+    const rnd = parseInt(race.round);
+    race.Results.forEach(res=>{
+      const name = DRIVER_MAP[res.Driver.driverId];
+      const teamName = TEAM_MAP[res.Constructor?.constructorId];
+      if(!name || !teamName) return;
+      if(!(name in lastRoundSeenByDriver) || rnd>=lastRoundSeenByDriver[name]){
+        lastRoundSeenByDriver[name] = rnd;
+        currentTeamByDriver[name] = teamName;
+      }
+    });
+  });
+
+  const driversByTeam = {};
+  const latestRoundWithResults = raceResults.reduce((max,race)=>race.Results&&race.Results.length?Math.max(max,parseInt(race.round)):max, 0);
+  const latestRace = raceResults.find(race=>parseInt(race.round)===latestRoundWithResults);
+  if(latestRace && latestRace.Results){
+    latestRace.Results.forEach(res=>{
+      const name = DRIVER_MAP[res.Driver.driverId];
+      const teamName = TEAM_MAP[res.Constructor?.constructorId];
+      if(!name || !teamName) return;
+      (driversByTeam[teamName] = driversByTeam[teamName]||[]).push(name);
+    });
+  }
+
+  const stats = {};
+  Object.values(DRIVER_MAP).forEach(n=>{ stats[n]={wins:0,poles:0,podiums:0,p2:0,p3:0,sprintWins:0,fastestLaps:0,q3:0,bestQuali:99,crash:0,mechanic:0}; });
+
+  const teamStats = {};
+  Object.values(TEAM_MAP).forEach(n=>{ teamStats[n]={poles:0,podiums:0,sprintWins:0,crash:0,mechanic:0}; });
+
+  // Classifica o motivo de não-finalização a partir do campo "status" da API
+  function classifyStatus(status){
+    if(!status) return null;
+    if(isClassifiedFinishStatus(status)) return 'finished';
+    if(['Disqualified','Did not qualify','Did not start','Withdrew','Excluded'].includes(status)) return 'other';
+    const crashKeywords = ['Accident','Collision','Spun off','Damage','Debris'];
+    if(crashKeywords.some(k=>status.includes(k))) return 'crash';
+    return 'mechanic';
+  }
+
+  raceResults.forEach(race=>{
+    if(!race.Results) return;
+    race.Results.forEach(res=>{
+      const name = DRIVER_MAP[res.Driver.driverId];
+      const teamName = TEAM_MAP[res.Constructor?.constructorId];
+      const pos = parseInt(res.position);
+      const cls = classifyStatus(res.status);
+      if(name && stats[name]){
+        if(pos===1) stats[name].wins++;
+        if(pos<=3) stats[name].podiums++;
+        if(pos===2) stats[name].p2++;
+        if(pos===3) stats[name].p3++;
+        if(res.FastestLap && res.FastestLap.rank==='1') stats[name].fastestLaps++;
+        if(cls==='crash') stats[name].crash++;
+        if(cls==='mechanic') stats[name].mechanic++;
+      }
+      if(teamName && teamStats[teamName]){
+        if(pos<=3) teamStats[teamName].podiums++;
+        if(cls==='crash') teamStats[teamName].crash++;
+        if(cls==='mechanic') teamStats[teamName].mechanic++;
+      }
+    });
+  });
+
+  qualResults.forEach(race=>{
+    race.QualifyingResults.forEach(res=>{
+      const name = DRIVER_MAP[res.Driver.driverId];
+      const teamName = TEAM_MAP[res.Constructor?.constructorId];
+      const pos = parseInt(res.position);
+      if(name && stats[name]){
+        // Pole = P1 na classificação (mantém a marca mesmo com penalidade de grid aplicada depois)
+        if(pos===1) stats[name].poles++;
+        if(pos<stats[name].bestQuali) stats[name].bestQuali=pos;
+        if(res.Q3 && res.Q3!=='') stats[name].q3++;
+      }
+      if(teamName && teamStats[teamName] && pos===1) teamStats[teamName].poles++;
+    });
+  });
+
+  sprintResults.forEach(race=>{
+    (race.SprintResults||[]).forEach(res=>{
+      const name = DRIVER_MAP[res.Driver.driverId];
+      const teamName = TEAM_MAP[res.Constructor?.constructorId];
+      const pos = parseInt(res.position);
+      if(name && stats[name] && pos===1) stats[name].sprintWins++;
+      if(teamName && teamStats[teamName] && pos===1) teamStats[teamName].sprintWins++;
+    });
+  });
+
+  const officialRound = currentRound;
+  const roundsWithResults = new Set(raceResults.filter(r=>r.Results&&r.Results.length).map(r=>String(r.round))).size;
+  const roundsWithQuali = new Set(qualResults.filter(r=>r.QualifyingResults&&r.QualifyingResults.length).map(r=>String(r.round))).size;
+  const scheduledSprints = scheduleRaces.filter(r=>parseInt(r.round)<=officialRound && r.Sprint).length;
+  const roundsWithSprint = new Set(sprintResults.map(r=>String(r.round))).size;
+  const resultsComplete = officialRound>0 && roundsWithResults>=officialRound;
+  const qualiComplete = officialRound>0 && roundsWithQuali>=officialRound;
+  const sprintComplete = scheduledSprints===0 || roundsWithSprint>=scheduledSprints;
+  if(!resultsComplete || !qualiComplete){
+    console.warn(`Feed da API incompleto (resultados: ${roundsWithResults}/${officialRound}, quali: ${roundsWithQuali}/${officialRound}) — mantendo dados locais revisados para estatísticas derivadas.`);
+  }
+
+  drvList.forEach(d=>{
+    const name = DRIVER_MAP[d.Driver.driverId];
+    const drv = findDriver(name);
+    if(!drv) return;
+    drv.pts = parseInt(d.points) || 0;
+    drv.pos = parseInt(d.position) || 99;
+    // Atualiza a equipe do piloto conforme a corrida mais recente (cobre substituições/trocas
+    // de time no meio da temporada), e a cor junto, para não mostrar um piloto com a cor da
+    // equipe antiga.
+    const detectedTeam = currentTeamByDriver[name];
+    if(detectedTeam){
+      drv.team = detectedTeam;
+      drv.color = TEAM_COLORS[detectedTeam] || drv.color;
+    }
+    const wins = parseInt(d.wins);
+    if(Number.isFinite(wins)) drv.wins = wins;
+    if(resultsComplete){
+      drv.podiums = stats[name].podiums;
+      drv.p2 = stats[name].p2;
+      drv.p3 = stats[name].p3;
+      drv.fastestLaps = stats[name].fastestLaps;
+      drv.crash = stats[name].crash;
+      drv.mechanic = stats[name].mechanic;
+    }
+    if(qualiComplete){
+      drv.poles = stats[name].poles;
+      drv.q3 = stats[name].q3;
+      if(stats[name].bestQuali<99) drv.bestQuali = stats[name].bestQuali;
+    }
+    if(sprintComplete) drv.sprintWins = stats[name].sprintWins;
+  });
+
+  conList.forEach(c=>{
+    const name = TEAM_MAP[c.Constructor.constructorId];
+    const team = findTeam(name);
+    if(!team) return;
+    team.pts = parseInt(c.points) || 0;
+    team.pos = parseInt(c.position) || 99;
+    const wins = parseInt(c.wins);
+    if(Number.isFinite(wins)) team.wins = wins;
+    if(teamStats[name]){
+      if(qualiComplete) team.poles = teamStats[name].poles;
+      if(resultsComplete){
+        team.podiums = teamStats[name].podiums;
+        team.crash = teamStats[name].crash;
+        team.mechanic = teamStats[name].mechanic;
+      }
+      if(sprintComplete) team.sprintWins = teamStats[name].sprintWins;
+    }
+    // Atualiza a dupla de pilotos exibida pela equipe conforme quem correu mais recentemente
+    // por ela — cobre substituições no meio da temporada (ex.: "Lindblad, Tsunoda").
+    if(driversByTeam[name] && driversByTeam[name].length){
+      const lineup = driversByTeam[name]
+        .slice()
+        .sort((a,b)=>(findDriver(a)?.pos ?? 99)-(findDriver(b)?.pos ?? 99))
+        .map(n=>n.trim().split(' ').pop());
+      team.drivers = lineup.join(', ');
+    }
+  });
+
+  // ===== Histórico de corridas por piloto (para o balão de resumo por etapa) =====
+  const qualPosByRound = {};
+  qualResults.forEach(race=>{
+    qualPosByRound[race.round] = {};
+    race.QualifyingResults.forEach(res=>{
+      const name = DRIVER_MAP[res.Driver.driverId];
+      if(name) qualPosByRound[race.round][name] = parseInt(res.position);
+    });
+  });
+
+  const sprintByRound = {};
+  sprintResults.forEach(race=>{
+    sprintByRound[race.round] = {};
+    (race.SprintResults||[]).forEach(res=>{
+      const name = DRIVER_MAP[res.Driver.driverId];
+      if(name) sprintByRound[race.round][name] = parseInt(res.position);
+    });
+  });
+
+  const newRaceHistory = {};
+  Object.values(DRIVER_MAP).forEach(n=>{ newRaceHistory[n]=[]; });
+  const newRaceMeta = {};
+
+  raceResults.forEach(race=>{
+    if(!race.Results) return;
+    newRaceMeta[race.round] = {
+      raceName: race.raceName, date: race.date,
+      country: race.Circuit?.Location?.country || ''
+    };
+    race.Results.forEach(res=>{
+      const name = DRIVER_MAP[res.Driver.driverId];
+      if(!name || !newRaceHistory[name]) return;
+      const finish = parseInt(res.position);
+      const grid = parseInt(res.grid);
+      const qualPos = qualPosByRound[race.round]?.[name] ?? null;
+      newRaceHistory[name].push({
+        round: parseInt(race.round),
+        raceName: race.raceName,
+        date: race.date,
+        country: race.Circuit?.Location?.country || '',
+        grid: grid,
+        qualPos: qualPos,
+        finish: finish,
+        points: parseFloat(res.points) || 0,
+        status: res.status,
+        fastestLap: !!(res.FastestLap && res.FastestLap.rank==='1'),
+        sprintFinish: sprintByRound[race.round]?.[name] ?? null
+      });
+    });
+  });
+  Object.values(newRaceHistory).forEach(arr=>arr.sort((a,b)=>b.round-a.round));
+  // Só substitui o histórico exibido se este ciclo trouxe TODAS as etapas; caso contrário,
+  // mantém o que já estava na tela (dado completo anterior) em vez de mostrar etapas faltando.
+  if(resultsComplete){
+    raceHistoryData = newRaceHistory;
+    raceMetaByRound = newRaceMeta;
+  } else if(!Object.keys(raceHistoryData).some(k=>raceHistoryData[k]?.length)){
+    // Não há nenhum dado completo anterior (nem em cache) — melhor mostrar o parcial que nada.
+    raceHistoryData = newRaceHistory;
+    raceMetaByRound = newRaceMeta;
+    console.warn('Histórico de corridas exibido está PARCIAL (sem dado completo anterior disponível).');
+  } else {
+    console.warn('Fetch incompleto nesta sincronização — mantendo o último histórico de corridas completo.');
+  }
+
+  drivers.sort((a,b)=>(a.pos||99)-(b.pos||99));
+  teams.sort((a,b)=>(a.pos||99)-(b.pos||99));
+  drivers.forEach((d,i)=>d.pos=i+1);
+  teams.forEach((t,i)=>t.pos=i+1);
+
+  return {resultsComplete, qualiComplete};
+}
+
+function setHeaderStatus(standings, complete){
+  const round = currentRound;
+  const syncOk = !!complete?.resultsComplete && !!complete?.qualiComplete;
+  const info = document.getElementById('apiInfo');
+  if(info){
+    info.textContent = syncOk
+      ? 'Temporada 2026 · Dados atualizados automaticamente (Jolpica F1 API · Etapa '+round+')'
+      : 'Temporada 2026 · Sincronização parcial nesta atualização — mantendo o último histórico completo (Etapa '+round+')';
+  }
+  const lastUpd = document.getElementById('lastUpdated');
+  if(lastUpd){
+    const now = new Date();
+    lastUpd.textContent = syncOk
+      ? 'Sincronizado às '+fmtHoraBR(now)+' (Brasília)'
+      : 'Última sincronização completa mantida (tentativa das '+fmtHoraBR(now)+' ficou parcial)';
+  }
+  const footer = document.getElementById('footerInfo');
+  if(footer && round){
+    footer.textContent = 'Temporada 2026 · Dados via Jolpica F1 API · '+round+(totalRaces?' de '+totalRaces:'')+' etapas disputadas · atualiza automaticamente em segundo plano';
+  }
+}
+
+function setHeaderLoading(){
+  const info = document.getElementById('apiInfo');
+  if(info) info.textContent = 'Temporada 2026 · Etapa '+currentRound+' · atualizando dados em segundo plano...';
+  const lastUpd = document.getElementById('lastUpdated');
+  if(lastUpd) lastUpd.textContent = 'Atualizando...';
+}
+
+function setHeaderFromCache(){
+  const info = document.getElementById('apiInfo');
+  if(info) info.textContent = 'Temporada 2026 · Etapa '+currentRound+' · exibindo dados salvos';
+  const lastUpd = document.getElementById('lastUpdated');
+  if(lastUpd && syncedAt){
+    lastUpd.textContent = 'Atualizado às '+fmtHoraBR(new Date(syncedAt))+' (Brasília)';
+  }
+  const footer = document.getElementById('footerInfo');
+  if(footer && currentRound){
+    footer.textContent = 'Temporada 2026 · Dados via Jolpica F1 API · '+currentRound+(totalRaces?' de '+totalRaces:'')+' etapas disputadas · atualiza automaticamente em segundo plano';
+  }
+}
+
+function setHeaderPartial(){
+  const info = document.getElementById('apiInfo');
+  if(info) info.textContent = 'Temporada 2026 · Etapa '+currentRound+' · classificação atualizada, carregando histórico...';
+  const lastUpd = document.getElementById('lastUpdated');
+  if(lastUpd) lastUpd.textContent = 'Atualizando estatísticas...';
+}
+
+function setHeaderOffline(hasCache){
+  const info = document.getElementById('apiInfo');
+  if(info){
+    info.textContent = hasCache
+      ? 'Temporada 2026 · Sem conexão — exibindo os últimos dados salvos'
+      : 'Temporada 2026 · API indisponível — usando os dados locais';
+  }
+  const lastUpd = document.getElementById('lastUpdated');
+  if(lastUpd){
+    lastUpd.textContent = syncedAt
+      ? 'Atualizado às '+fmtHoraBR(new Date(syncedAt))+' (Brasília)'
+      : 'Falha ao atualizar agora';
+  }
+  const hero = document.getElementById('heroStatus');
+  if(hero && !hasCache) hero.textContent = 'Não foi possível atualizar agora. Tente recarregar em instantes.';
+}
+
+// Renderiza o que já está em memória/cache. É chamado antes e depois do
+// histórico chegar, para a página nunca ficar vazia esperando a rede.
+function renderBase(){
+  populateSelects();
+  renderTabela(abaAtual);
+  if(scheduleRaces.length) loadNextRaceWidget(scheduleRaces);
+}
+
+async function syncLiveData(force=false){
+  if(syncInFlight) return syncInFlight;
+  if(!force && syncedAt && Date.now()-syncedAt < SYNC_TTL_MS) return;
+
+  const hasCache = Object.keys(roundsData).length > 0 || Object.keys(raceHistoryData).length > 0;
+  const heroSt = document.getElementById('heroStatus');
+  if(heroSt && !hasCache) heroSt.textContent = 'Buscando dados atualizados da F1...';
+  if(hasCache) setHeaderLoading();
+
+  syncInFlight = (async ()=>{
+    const base = await fetchSeasonBase();
+    if(!base.drvRes || !base.conRes){
+      setHeaderOffline(hasCache);
+      return;
+    }
+
+    // Passo 1 (rápido): classificação, calendário e pontos. Costuma resolver em
+    // 1-2 s e já libera a tabela e o comparador; o histórico vem depois.
+    const standings = applyStandings(base);
+    renderBase();
+    setHeaderPartial();
+    if(heroSt) heroSt.textContent = '';
+
+    // Passo 2: histórico. Numa primeira visita baixa a temporada em páginas
+    // agregadas (8 requisições em vez de 54); nas seguintes, só as etapas que
+    // faltam e as duas mais recentes.
+    const missing = missingRounds();
+    if(missing.length > 4){
+      await Promise.all([
+        fetchPagedRaces('results','results'),
+        fetchPagedRaces('qualifying','qualifying'),
+        fetchPagedRaces('sprint','sprint')
+      ]);
+    }else{
+      const targets = new Set(missing);
+      if(currentRound > 0){
+        targets.add(currentRound);
+        if(currentRound > 1) targets.add(currentRound-1);
+      }
+      for(const r of Array.from(targets).sort((a,b)=>a-b)){
+        if(r < 1 || r > currentRound) continue;
+        await fetchRoundData(r, roundHasSprint(r));
+      }
+    }
+
+    // A classificação mais recente pode ser de uma etapa que ainda não entrou
+    // na classificação do campeonato (ex.: quali no sábado, corrida no domingo).
+    // Buscamos essa etapa à parte para o grid não sumir no fim de semana.
+    const gridRace = latestQualifyingRace();
+    if(gridRace && !roundsData[roundKey(gridRace.round)]?.qualifying){
+      await fetchRoundData(gridRace.round, roundHasSprint(gridRace.round));
+    }
+
+    const complete = rebuildSeasonStats(standings);
+    syncedAt = Date.now();
+    saveCachedData();
+    renderBase();
+    refreshGridFromCache();
+    setHeaderStatus(standings, complete);
+  })()
+    .catch(e=>{
+      console.error('Falha na sincronização:', e);
+      setHeaderOffline(hasCache);
+    })
+    .finally(()=>{ syncInFlight = null; });
+
+  return syncInFlight;
+}
+
 
 function setTipo(t){
   tipoAtual = t;
@@ -1392,22 +1828,40 @@ function populateSelects(){
   const list = tipoAtual==='piloto' ? drivers : teams;
   const s1 = document.getElementById('select1');
   const s2 = document.getElementById('select2');
-  s1.innerHTML = ''; s2.innerHTML = '';
-  list.forEach((d,i)=>{
-    s1.innerHTML += `<option value="${i}">${d.name} (${d.pts} pts)</option>`;
-    s2.innerHTML += `<option value="${i}">${d.name} (${d.pts} pts)</option>`;
-  });
-  if(list.length>1) s2.value = 1;
+  if(!s1 || !s2 || !list.length) return;
+
+  // Preserva a escolha do usuário mesmo depois de a classificação ser
+  // reordenada pela API (o índice do <option> muda quando a ordem muda).
+  const saved = selectionByType[tipoAtual] || [];
+  const options = list.map((d,i)=>`<option value="${i}">${d.name} (${d.pts} pts)</option>`).join('');
+  s1.innerHTML = options;
+  s2.innerHTML = options;
+
+  let i1 = list.findIndex(d=>d.name===saved[0]);
+  let i2 = list.findIndex(d=>d.name===saved[1]);
+  if(i1 < 0) i1 = 0;
+  if(i2 < 0) i2 = list.length>1 ? 1 : 0;
+  if(i2 === i1 && list.length>1) i2 = (i1+1)%list.length;
+
+  s1.value = i1;
+  s2.value = i2;
   s1.onchange = comparar;
   s2.onchange = comparar;
   comparar();
+}
+
+function rememberSelection(list, i1, i2){
+  selectionByType[tipoAtual] = [list[i1]?.name, list[i2]?.name].filter(Boolean);
+  try{ localStorage.setItem(SELECTION_KEY, JSON.stringify(selectionByType)); }catch(e){}
 }
 
 function comparar(){
   const list = tipoAtual==='piloto' ? drivers : teams;
   const i1 = parseInt(document.getElementById('select1').value);
   const i2 = parseInt(document.getElementById('select2').value);
-  const d1 = list[i1], d2 = list[i2];
+  const d1 = list[i1] || list[0], d2 = list[i2] || list[1] || list[0];
+  if(!d1 || !d2) return;
+  rememberSelection(list, i1, i2);
   const diff = Math.abs(d1.pts - d2.pts);
   const winner = d1.pts >= d2.pts ? 1 : 2;
   const w = winner===1 ? d1 : d2;
@@ -1555,8 +2009,9 @@ function comparar(){
 }
 
 function showTab(tab,el){
+  abaAtual = tab;
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-  el.classList.add('active');
+  if(el) el.classList.add('active');
   renderTabela(tab);
 }
 
@@ -1636,9 +2091,6 @@ function renderTabela(tab,listOverride){
     });
   });
 }
-
-populateSelects();
-renderTabela('pilotos');
 
 /* ===== Histórico de Corridas por piloto (lado a lado, ligado ao comparador) ===== */
 function statusReasonPT(status){
@@ -1779,6 +2231,20 @@ function renderHistoricoComparativo(){
   renderHistorico(d1.name, 'histContainerLeft');
   renderHistorico(d2.name, 'histContainerRight');
 }
+
+/* ===== Inicialização =====
+   Ordem: pinta o que já está no cache (instantâneo), depois busca o que falta
+   em segundo plano. Nada de bloquear a primeira renderização esperando a API. */
+loadCachedData();
+if(syncedAt) setHeaderFromCache();
+renderBase();
+syncLiveData();
+
+document.addEventListener('visibilitychange', ()=>{
+  if(document.visibilityState==='visible' && Date.now()-syncedAt > SYNC_TTL_MS){
+    syncLiveData();
+  }
+});
 </script>
 </body>
 </html>
